@@ -1,16 +1,27 @@
 import { prisma } from "@/lib/prisma";
+import VisitsClient from "./VisitsClient";
 
-async function getVisits() {
-  return prisma.visit.findMany({
-    include: {
-      property: {
-        include: { customer: { include: { user: { select: { name: true } } } } },
+async function getData() {
+  const [visits, properties, technicians] = await Promise.all([
+    prisma.visit.findMany({
+      include: {
+        property: {
+          include: { customer: { include: { user: { select: { name: true } } } } },
+        },
+        technician: { include: { user: { select: { name: true } } } },
+        report: { select: { signedByTechnician: true } },
       },
-      technician: { include: { user: { select: { name: true } } } },
-      report: { select: { signedByTechnician: true } },
-    },
-    orderBy: { scheduledAt: "asc" },
-  });
+      orderBy: { scheduledAt: "asc" },
+    }),
+    prisma.property.findMany({
+      include: { customer: { include: { user: { select: { name: true } } } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.technician.findMany({
+      include: { user: { select: { name: true } } },
+    }),
+  ]);
+  return { visits, properties, technicians };
 }
 
 const statusColors: Record<string, string> = {
@@ -21,11 +32,14 @@ const statusColors: Record<string, string> = {
 };
 
 export default async function VisitsPage() {
-  const visits = await getVisits();
+  const { visits, properties, technicians } = await getData();
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Visits</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Visits</h1>
+        <VisitsClient properties={properties} technicians={technicians} />
+      </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
@@ -72,7 +86,12 @@ export default async function VisitsPage() {
                         {v.report.signedByTechnician ? "Signed" : "Unsigned"}
                       </span>
                     ) : (
-                      <span className="text-gray-400 text-xs">No report</span>
+                      <a
+                        href={`/visits/${v.id}/report`}
+                        className="text-brand-600 text-xs font-medium hover:underline"
+                      >
+                        Add report
+                      </a>
                     )}
                   </td>
                 </tr>

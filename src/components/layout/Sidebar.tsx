@@ -25,7 +25,7 @@ export default function Sidebar({ role }: { role: "ADMIN" | "TECHNICIAN" | "CUST
   return (
     <aside className="w-60 min-h-screen bg-white border-r border-gray-200 flex flex-col">
       <div className="px-6 py-5 border-b border-gray-100">
-        <span className="text-lg font-bold text-brand-700">TennVice</span>
+        <span className="text-2xl font-bold text-brand-700">TennVice</span>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">

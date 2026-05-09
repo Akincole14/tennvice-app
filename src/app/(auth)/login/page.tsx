@@ -28,7 +28,11 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Invalid email or password.");
     } else {
-      router.push("/dashboard");
+      // Fetch the session to get the user's role, then redirect accordingly
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      const role = session?.user?.role;
+      router.push(role === "CUSTOMER" ? "/portal" : "/dashboard");
     }
   }
 
@@ -36,7 +40,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-brand-700">
+          <Link href="/" className="text-3xl font-bold text-brand-700">
             TennVice
           </Link>
           <p className="text-gray-500 mt-2 text-sm">Sign in to your account</p>

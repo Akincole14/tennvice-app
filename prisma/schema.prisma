@@ -47,24 +47,19 @@ model VerificationToken {
 }
 
 // ─── Users ───────────────────────────────────────────────────────────────────
-
-enum Role {
-  ADMIN
-  TECHNICIAN
-  CUSTOMER
-}
+// Role values: ADMIN | TECHNICIAN | CUSTOMER
 
 model User {
-  id            String     @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String?
-  email         String?    @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
   passwordHash  String?
-  role          Role       @default(CUSTOMER)
+  role          String      @default("CUSTOMER")
   phone         String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   accounts      Account[]
   sessions      Session[]
   customer      Customer?
@@ -72,77 +67,57 @@ model User {
 }
 
 // ─── Customers & Properties ───────────────────────────────────────────────────
-
-enum SubscriptionTier {
-  BASIC         // £15/month — 2 visits, minor checks, 20% discount
-  STANDARD      // £22/month — 2 visits, boiler check (no service), 20% discount
-  PLUS          // £27/month — flexible visits, flushing, 30% discount
-  PREMIUM       // £40-50/month — all + boiler service, 40% discount, 2 emergency call-outs
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  PAUSED
-  CANCELLED
-}
+// SubscriptionTier values: BASIC | STANDARD | PLUS | PREMIUM
+//   BASIC    — £15/month, 2 visits, minor checks, 20% discount
+//   STANDARD — £22/month, 2 visits, boiler check (no service), 20% discount
+//   PLUS     — £27/month, flexible visits, flushing, 30% discount
+//   PREMIUM  — £40-50/month, all + boiler service, 40% discount, 2 emergency call-outs
+// SubscriptionStatus values: ACTIVE | PAUSED | CANCELLED
 
 model Customer {
-  id                 String             @id @default(cuid())
-  userId             String             @unique
-  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscriptionTier   SubscriptionTier   @default(BASIC)
-  subscriptionStatus SubscriptionStatus @default(ACTIVE)
-  visitsPerYear      Int                @default(2)
-  emergencyCallouts  Int                @default(0)  // remaining for the year
-  discountPercent    Int                @default(20)
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  id                 String     @id @default(cuid())
+  userId             String     @unique
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionTier   String     @default("BASIC")
+  subscriptionStatus String     @default("ACTIVE")
+  visitsPerYear      Int        @default(2)
+  emergencyCallouts  Int        @default(0)
+  discountPercent    Int        @default(20)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
   properties         Property[]
 }
 
 model Property {
-  id          String    @id @default(cuid())
-  customerId  String
-  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  address     String
-  postcode    String
-  propertyType String   @default("House")  // House, Flat, Bungalow, etc.
-  bedrooms    Int?
-  notes       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  visits      Visit[]
-}
-
-// ─── Technicians ──────────────────────────────────────────────────────────────
-
-model Technician {
   id           String   @id @default(cuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  qualification String?
-  licenceNumber String?
+  customerId   String
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  address      String
+  postcode     String
+  propertyType String   @default("House")
+  bedrooms     Int?
+  notes        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   visits       Visit[]
 }
 
+// ─── Technicians ──────────────────────────────────────────────────────────────
+
+model Technician {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qualification String?
+  licenceNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  visits        Visit[]
+}
+
 // ─── Visits & Reports ─────────────────────────────────────────────────────────
-
-enum VisitStatus {
-  SCHEDULED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-enum VisitType {
-  ROUTINE_PLUMBING
-  ROUTINE_ELECTRICAL
-  ROUTINE_BOTH
-  EMERGENCY
-  BOILER_SERVICE
-}
+// VisitStatus values: SCHEDULED | IN_PROGRESS | COMPLETED | CANCELLED
+// VisitType   values: ROUTINE_PLUMBING | ROUTINE_ELECTRICAL | ROUTINE_BOTH | EMERGENCY | BOILER_SERVICE
 
 model Visit {
   id           String      @id @default(cuid())
@@ -152,62 +127,57 @@ model Visit {
   technician   Technician? @relation(fields: [technicianId], references: [id])
   scheduledAt  DateTime
   completedAt  DateTime?
-  status       VisitStatus @default(SCHEDULED)
-  type         VisitType   @default(ROUTINE_BOTH)
+  status       String      @default("SCHEDULED")
+  type         String      @default("ROUTINE_BOTH")
   isEmergency  Boolean     @default(false)
   report       Report?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 }
 
-enum CheckResult {
-  PASS
-  ADVISORY
-  FAIL
-  NOT_CHECKED
-}
+// CheckResult values: PASS | ADVISORY | FAIL | NOT_CHECKED
 
 model Report {
-  id                  String      @id @default(cuid())
-  visitId             String      @unique
-  visit               Visit       @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  id                 String   @id @default(cuid())
+  visitId            String   @unique
+  visit              Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
 
   // Plumbing checks
-  pipesCheck          CheckResult @default(NOT_CHECKED)
-  pipesNotes          String?
-  heatingCheck        CheckResult @default(NOT_CHECKED)
-  heatingNotes        String?
-  waterPumpCheck      CheckResult @default(NOT_CHECKED)
-  waterPumpNotes      String?
-  cylinderCheck       CheckResult @default(NOT_CHECKED)
-  cylinderNotes       String?
-  pressureCheck       CheckResult @default(NOT_CHECKED)
-  pressureNotes       String?
-  leakageCheck        CheckResult @default(NOT_CHECKED)
-  leakageNotes        String?
+  pipesCheck         String   @default("NOT_CHECKED")
+  pipesNotes         String?
+  heatingCheck       String   @default("NOT_CHECKED")
+  heatingNotes       String?
+  waterPumpCheck     String   @default("NOT_CHECKED")
+  waterPumpNotes     String?
+  cylinderCheck      String   @default("NOT_CHECKED")
+  cylinderNotes      String?
+  pressureCheck      String   @default("NOT_CHECKED")
+  pressureNotes      String?
+  leakageCheck       String   @default("NOT_CHECKED")
+  leakageNotes       String?
 
   // Electrical checks
-  electricalCheck     CheckResult @default(NOT_CHECKED)
-  electricalNotes     String?
-  usageAdviceGiven    Boolean     @default(false)
+  electricalCheck    String   @default("NOT_CHECKED")
+  electricalNotes    String?
+  usageAdviceGiven   Boolean  @default(false)
 
   // Boiler
-  boilerCheck         CheckResult @default(NOT_CHECKED)
-  boilerNotes         String?
-  boilerServiced      Boolean     @default(false)
+  boilerCheck        String   @default("NOT_CHECKED")
+  boilerNotes        String?
+  boilerServiced     Boolean  @default(false)
 
   // Flushing
-  systemFlushed       Boolean     @default(false)
-  cylinderFlushed     Boolean     @default(false)
+  systemFlushed      Boolean  @default(false)
+  cylinderFlushed    Boolean  @default(false)
 
   // Overall
-  overallNotes        String?
-  recommendations     String?
-  partsRequired       String?
-  followUpRequired    Boolean     @default(false)
-  signedByTechnician  Boolean     @default(false)
-  signedAt            DateTime?
+  overallNotes       String?
+  recommendations    String?
+  partsRequired      String?
+  followUpRequired   Boolean  @default(false)
+  signedByTechnician Boolean  @default(false)
+  signedAt           DateTime?
 
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

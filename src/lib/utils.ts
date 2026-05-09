@@ -43,4 +43,18 @@ export const SUBSCRIPTION_TIERS = {
       "2 emergency call-outs per year",
     ],
   },
+  ENTERPRISE: {
+    label: "Enterprise",
+    price: 75,
+    visitsPerYear: 12,
+    discount: 50,
+    emergencyCallouts: Infinity,
+    features: [
+      "All Premium benefits",
+      "12 visits per year",
+      "50% discount on parts & labour",
+      "Unlimited emergency call-outs",
+      "Dedicated account manager",
+    ],
+  },
 } as const;

@@ -6,7 +6,7 @@ export default function HomePage() {
     <main className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-        <span className="text-xl font-bold text-brand-700">TennVice</span>
+        <span className="text-2xl font-bold text-brand-700">TennVice</span>
         <Link
           href="/login"
           className="text-sm font-medium text-brand-600 hover:text-brand-700"
