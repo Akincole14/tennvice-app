@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AccountClient from "@/app/(customer)/portal/account/AccountClient";
+import PhotoUpload from "./PhotoUpload";
 
 export default async function TechAccountPage() {
   const session = await getServerSession(authOptions);
@@ -10,19 +11,32 @@ export default async function TechAccountPage() {
 
   const userId = (session.user as any).id as string;
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { name: true, email: true, phone: true },
-  });
+  const [user, technician] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true, phone: true, image: true },
+    }),
+    prisma.technician.findUnique({
+      where: { userId },
+      select: { id: true },
+    }),
+  ]);
 
-  if (!user) redirect("/login");
+  if (!user || !technician) redirect("/login");
 
   return (
     <div className="max-w-xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
-        <p className="text-gray-500 mt-1">Update your personal details and password</p>
+        <p className="text-gray-500 mt-1">Update your profile photo, personal details and password</p>
       </div>
+
+      <PhotoUpload
+        technicianId={technician.id}
+        name={user.name ?? ""}
+        currentPhoto={user.image ?? null}
+      />
+
       <AccountClient user={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone }} />
     </div>
   );

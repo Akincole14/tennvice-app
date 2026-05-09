@@ -12,7 +12,7 @@ const nav = [
   { href: "/tech/certificates", label: "Certificates",  icon: Award,           exact: false },
 ];
 
-export default function TechnicianSidebar({ name }: { name: string }) {
+export default function TechnicianSidebar({ name, photo }: { name: string; photo?: string | null }) {
   const pathname = usePathname();
 
   return (
@@ -25,8 +25,14 @@ export default function TechnicianSidebar({ name }: { name: string }) {
       {/* Technician identity */}
       <div className="px-4 py-3 mx-3 mt-3 mb-1 bg-brand-50 rounded-xl">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-            {name.charAt(0)}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            {photo ? (
+              <img src={photo} alt={name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
+                {name.charAt(0)}
+              </div>
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{name}</p>

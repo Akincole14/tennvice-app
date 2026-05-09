@@ -26,7 +26,7 @@ export default async function TechnicianDetailPage({ params }: { params: Promise
   const technician = await prisma.technician.findUnique({
     where: { id },
     include: {
-      user: { select: { name: true, email: true, phone: true } },
+      user: { select: { name: true, email: true, phone: true, image: true } },
       certificates: { orderBy: { createdAt: "desc" } },
       visits: {
         include: {

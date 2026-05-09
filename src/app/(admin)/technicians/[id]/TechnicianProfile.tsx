@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Pencil, X, Loader2, CheckCircle, AlertCircle, Wrench } from "lucide-react";
+import { useRef, useState } from "react";
+import { Pencil, X, Loader2, CheckCircle, AlertCircle, Wrench, Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Technician = {
   id: string;
   qualification: string | null;
   licenceNumber: string | null;
-  user: { name: string | null; email: string | null; phone: string | null };
+  user: { name: string | null; email: string | null; phone: string | null; image: string | null };
 };
 
 function Field({
@@ -30,8 +30,13 @@ function Field({
 }
 
 export default function TechnicianProfile({ technician }: { technician: Technician }) {
-  const router = useRouter();
+  const router  = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
+
   const [editing, setEditing] = useState(false);
+  const [photo,   setPhoto]   = useState(technician.user.image);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError,     setPhotoError]     = useState<string | null>(null);
 
   const [name,          setName]          = useState(technician.user.name ?? "");
   const [email,         setEmail]         = useState(technician.user.email ?? "");
@@ -42,6 +47,22 @@ export default function TechnicianProfile({ technician }: { technician: Technici
 
   const [loading, setLoading] = useState(false);
   const [status,  setStatus]  = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoUploading(true);
+    setPhotoError(null);
+    const fd = new FormData();
+    fd.append("photo", file);
+    const res  = await fetch(`/api/technicians/${technician.id}/photo`, { method: "POST", body: fd });
+    const data = await res.json();
+    setPhotoUploading(false);
+    if (!res.ok) { setPhotoError(data.error ?? "Upload failed"); return; }
+    setPhoto(data.imageUrl);
+    router.refresh();
+    e.target.value = "";
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -65,14 +86,53 @@ export default function TechnicianProfile({ technician }: { technician: Technici
     <div className="bg-white rounded-2xl border border-gray-200 p-6">
       <div className="flex items-start justify-between mb-5">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-xl shrink-0">
-            {name.charAt(0) || "T"}
+          {/* Avatar with upload overlay */}
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={photoUploading}
+              className="relative group w-16 h-16 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+              title="Change photo"
+            >
+              {photo ? (
+                <img src={photo} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-2xl">
+                  {name.charAt(0) || "T"}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {photoUploading
+                  ? <Loader2 className="w-5 h-5 text-white animate-spin" />
+                  : <Camera className="w-5 h-5 text-white" />}
+              </div>
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handlePhotoChange}
+              disabled={photoUploading}
+            />
           </div>
+
           <div>
             <h1 className="text-xl font-bold text-gray-900">{name || "—"}</h1>
             <p className="text-sm text-gray-500">{email}</p>
+            {photoError && <p className="text-xs text-red-600 mt-0.5">{photoError}</p>}
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={photoUploading}
+              className="text-xs text-brand-600 hover:text-brand-800 mt-1 disabled:opacity-40"
+            >
+              {photoUploading ? "Uploading…" : "Change photo"}
+            </button>
           </div>
         </div>
+
         <button
           onClick={() => { setEditing(e => !e); setStatus(null); }}
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-xl transition-colors"
@@ -84,10 +144,10 @@ export default function TechnicianProfile({ technician }: { technician: Technici
       {editing ? (
         <form onSubmit={save} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Full name"      value={name}          onChange={setName} />
-            <Field label="Email address"  type="email" value={email}  onChange={setEmail} />
-            <Field label="Phone number"   type="tel"   value={phone}  onChange={setPhone} />
-            <Field label="New password"   type="password" value={newPassword} onChange={setNewPassword} />
+            <Field label="Full name"    value={name}        onChange={setName} />
+            <Field label="Email"        type="email"  value={email}       onChange={setEmail} />
+            <Field label="Phone"        type="tel"    value={phone}       onChange={setPhone} />
+            <Field label="New password" type="password" value={newPassword} onChange={setNewPassword} />
           </div>
           <div className="border-t border-gray-100 pt-4 grid grid-cols-2 gap-3">
             <Field label="Qualification"  value={qualification} onChange={setQualification} />
