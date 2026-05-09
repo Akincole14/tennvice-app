@@ -205,40 +205,112 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
         </div>
       )}
 
-      {/* Visit timeline */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
+      {/* Visit history */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
           <h2 className="font-semibold text-gray-900">Visit history</h2>
+          <span className="text-xs text-gray-400">{property.visits.length} visit{property.visits.length !== 1 ? "s" : ""}</span>
         </div>
+
         {property.visits.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-gray-400 text-center">No visits recorded yet for this property.</p>
+          <div className="bg-white rounded-2xl border border-gray-200 px-6 py-10 text-sm text-gray-400 text-center">
+            No visits recorded yet for this property.
+          </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {property.visits.map((v) => (
-              <Link
-                key={v.id}
-                href={`/portal/visits/${v.id}`}
-                className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900">
-                    {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {typeLabels[v.type] ?? v.type}
-                    {v.technician ? ` · ${v.technician.user.name}` : " · Technician TBC"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 ml-3 shrink-0">
-                  {v.report?.followUpRequired && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">Follow-up</span>
+          <div className="space-y-3">
+            {property.visits.map((v) => {
+              const reportChecks = v.report?.signedByTechnician
+                ? [
+                    { label: "Pipes",      result: v.report.pipesCheck },
+                    { label: "Heating",    result: v.report.heatingCheck },
+                    { label: "Water pump", result: v.report.waterPumpCheck },
+                    { label: "Cylinder",   result: v.report.cylinderCheck },
+                    { label: "Pressure",   result: v.report.pressureCheck },
+                    { label: "Leakage",    result: v.report.leakageCheck },
+                    { label: "Electrical", result: v.report.electricalCheck },
+                    { label: "Boiler",     result: v.report.boilerCheck },
+                  ].filter((c) => c.result !== "NOT_CHECKED")
+                : [];
+
+              return (
+                <Link
+                  key={v.id}
+                  href={`/portal/visits/${v.id}`}
+                  className="block bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+                >
+                  {/* Visit header row */}
+                  <div className="flex items-center justify-between p-5">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900">
+                        {new Date(v.scheduledAt).toLocaleDateString("en-GB", {
+                          weekday: "long", day: "numeric", month: "long", year: "numeric",
+                        })}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {typeLabels[v.type] ?? v.type}
+                        {v.technician ? ` · ${v.technician.user.name}` : " · Technician TBC"}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 ml-4 shrink-0">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
+                        {v.status.replace("_", " ")}
+                      </span>
+                      {v.report?.followUpRequired && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                          Follow-up needed
+                        </span>
+                      )}
+                      {v.isEmergency && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-700">
+                          Emergency
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Inline report summary for signed visits */}
+                  {v.report?.signedByTechnician && (
+                    <div className="px-5 pb-5 pt-0">
+                      <div className="border-t border-gray-100 pt-4">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Report summary</p>
+                        {reportChecks.length > 0 ? (
+                          <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                            {reportChecks.map(({ label, result }) => {
+                              const Icon = checkIcon[result] ?? MinusCircle;
+                              return (
+                                <div key={label} className="flex items-center gap-1.5">
+                                  <Icon className={`w-3.5 h-3.5 shrink-0 ${checkColor[result]}`} />
+                                  <span className="text-gray-500">{label}</span>
+                                  <span className={`font-medium text-xs ${checkColor[result]}`}>
+                                    {result.charAt(0) + result.slice(1).toLowerCase()}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-400">No checks recorded.</p>
+                        )}
+                        {v.report.recommendations && (
+                          <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                            <span className="font-medium">Recommendations:</span> {v.report.recommendations}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   )}
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
-                    {v.status.replace("_", " ")}
-                  </span>
-                </div>
-              </Link>
-            ))}
+
+                  {/* Pending report notice for completed but unsigned */}
+                  {v.status === "COMPLETED" && v.report && !v.report.signedByTechnician && (
+                    <div className="px-5 pb-4 pt-0">
+                      <div className="border-t border-gray-100 pt-3">
+                        <p className="text-xs text-gray-400 italic">Report being finalised by technician.</p>
+                      </div>
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
