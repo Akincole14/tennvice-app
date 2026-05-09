@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Calendar, Award, Settings, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/tech",        label: "Dashboard",  icon: LayoutDashboard, exact: true },
-  { href: "/tech/visits", label: "My Visits",  icon: Calendar,        exact: false },
+  { href: "/tech",              label: "Dashboard",     icon: LayoutDashboard, exact: true },
+  { href: "/tech/visits",       label: "My Visits",     icon: Calendar,        exact: false },
+  { href: "/tech/certificates", label: "Certificates",  icon: Award,           exact: false },
 ];
 
 export default function TechnicianSidebar({ name }: { name: string }) {

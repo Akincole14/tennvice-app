@@ -106,14 +106,42 @@ model Property {
 // ─── Technicians ──────────────────────────────────────────────────────────────
 
 model Technician {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String                   @id @default(cuid())
+  userId        String                   @unique
+  user          User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   qualification String?
   licenceNumber String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
   visits        Visit[]
+  certificates  TechnicianCertificate[]
+}
+
+model TechnicianCertificate {
+  id           String     @id @default(cuid())
+  technicianId String
+  technician   Technician @relation(fields: [technicianId], references: [id], onDelete: Cascade)
+
+  fileName     String     // Original filename
+  fileUrl      String     // Served path e.g. /uploads/certificates/abc.pdf
+  fileType     String     // MIME type
+
+  // AI extraction results
+  aiCertName   String?    // Certificate title
+  aiIssuer     String?    // Issuing body
+  aiHolder     String?    // Holder name on cert
+  aiLicenceNo  String?    // Cert/licence number
+  aiIssuedAt   String?    // Issue date (string)
+  aiExpiresAt  String?    // Expiry date (string)
+  aiSummary    String?    // AI narrative summary
+  aiConfidence String?    // HIGH | MEDIUM | LOW
+  aiValid      Boolean    @default(false)
+
+  // Admin review
+  status       String     @default("PENDING")  // PENDING | VERIFIED | REJECTED
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 // ─── Visits & Reports ─────────────────────────────────────────────────────────

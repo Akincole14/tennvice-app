@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import TechnicianProfile from "./TechnicianProfile";
+import AdminCertificates from "./AdminCertificates";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine Plumbing",
@@ -26,6 +27,7 @@ export default async function TechnicianDetailPage({ params }: { params: Promise
     where: { id },
     include: {
       user: { select: { name: true, email: true, phone: true } },
+      certificates: { orderBy: { createdAt: "desc" } },
       visits: {
         include: {
           property: { select: { address: true, postcode: true } },
@@ -145,6 +147,9 @@ export default async function TechnicianDetailPage({ params }: { params: Promise
           </div>
         )}
       </div>
+
+      {/* Certificates */}
+      <AdminCertificates certificates={technician.certificates} technicianId={technician.id} />
     </div>
   );
 }
