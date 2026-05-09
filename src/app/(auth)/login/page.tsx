@@ -32,7 +32,11 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/session");
       const session = await res.json();
       const role = session?.user?.role;
-      router.push(role === "CUSTOMER" ? "/portal" : "/dashboard");
+      router.push(
+        role === "CUSTOMER"   ? "/portal" :
+        role === "TECHNICIAN" ? "/tech"   :
+        "/dashboard"
+      );
     }
   }
 
