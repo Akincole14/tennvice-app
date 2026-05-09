@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         const sub  = await gocardless.subscriptions.create({
           amount:        String(Math.round(tier.price * 100)),
           currency:      "GBP",
-          name:          `TennVice ${tier.label}`,
+          name:          `Tennvice ${tier.label}`,
           interval_unit: "monthly" as any,
           day_of_month:  "1",
           links:         { mandate: mandateId },

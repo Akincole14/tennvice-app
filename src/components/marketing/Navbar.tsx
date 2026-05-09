@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-brand-700 shrink-0">
-          TennVice
+          Tennvice
         </Link>
 
         {/* Desktop nav */}

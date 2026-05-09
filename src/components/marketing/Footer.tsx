@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="md:col-span-2">
-            <span className="text-2xl font-bold text-white">TennVice</span>
+            <span className="text-2xl font-bold text-white">Tennvice</span>
             <p className="mt-3 text-sm leading-relaxed max-w-xs">
               Subscription-based home maintenance giving every home a full service history — just like your car.
             </p>
@@ -36,7 +36,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-800 text-xs text-center text-gray-600">
-          © {new Date().getFullYear()} TennVice Ltd. All rights reserved.
+          © {new Date().getFullYear()} Tennvice Ltd. All rights reserved.
         </div>
       </div>
     </footer>

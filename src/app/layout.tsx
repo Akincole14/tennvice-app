@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TennVice — Home Maintenance Platform",
+  title: "Tennvice — Home Maintenance Platform",
   description: "Subscription-based home maintenance and health check service",
 };
 

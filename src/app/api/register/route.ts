@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
     mandate_request: {
       scheme:      "bacs",
       currency:    "GBP",
-      description: `TennVice ${tier.label} subscription`,
+      description: `Tennvice ${tier.label} subscription`,
     },
     metadata: {
       customerId,

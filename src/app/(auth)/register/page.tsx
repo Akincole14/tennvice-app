@@ -322,7 +322,7 @@ function Step4({ data }: { data: FormData }) {
 
       {/* DD Guarantee notice */}
       <p className="text-[11px] text-gray-400 leading-relaxed">
-        Payments are collected by GoCardless Ltd on behalf of TennVice. GoCardless is authorised by the Financial Conduct Authority under the Payment Services Regulations 2017, registration number 597190, for the provision of payment services.
+        Payments are collected by GoCardless Ltd on behalf of Tennvice. GoCardless is authorised by the Financial Conduct Authority under the Payment Services Regulations 2017, registration number 597190, for the provision of payment services.
       </p>
     </div>
   );
@@ -416,7 +416,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-brand-700 inline-block mb-2">TennVice</Link>
+          <Link href="/" className="text-3xl font-bold text-brand-700 inline-block mb-2">Tennvice</Link>
           <div className="flex justify-center mb-3">
             <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-700 transition-colors">
               <ArrowLeft className="w-3.5 h-3.5" />

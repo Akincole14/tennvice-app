@@ -59,7 +59,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="relative">
           <Link href="/" className="inline-flex items-center gap-2 text-white">
-            <span className="text-2xl font-bold">TennVice</span>
+            <span className="text-2xl font-bold">Tennvice</span>
           </Link>
         </div>
 
@@ -89,7 +89,7 @@ export default function LoginPage() {
         {/* Bottom trust note */}
         <div className="relative">
           <p className="text-brand-200 text-xs">
-            © {new Date().getFullYear()} TennVice Ltd · Secured & encrypted
+            © {new Date().getFullYear()} Tennvice Ltd · Secured & encrypted
           </p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
           {/* Logo on mobile (hidden on desktop where left panel shows it) */}
           <div className="mt-6 lg:hidden">
-            <span className="text-2xl font-bold text-brand-700">TennVice</span>
+            <span className="text-2xl font-bold text-brand-700">Tennvice</span>
           </div>
         </div>
 

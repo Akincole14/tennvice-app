@@ -108,7 +108,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-              TennVice sends certified technicians for regular plumbing, electrical and boiler checks — giving your home a verifiable service record, just like a car.
+              Tennvice sends certified technicians for regular plumbing, electrical and boiler checks — giving your home a verifiable service record, just like a car.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
@@ -178,7 +178,7 @@ export default function HomePage() {
         <section id="features" className="py-24 px-6 bg-gray-50">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900">Why homeowners choose TennVice</h2>
+              <h2 className="text-4xl font-bold text-gray-900">Why homeowners choose Tennvice</h2>
               <p className="text-lg text-gray-500 mt-4 max-w-xl mx-auto">
                 We combine qualified tradespeople with digital record-keeping so you always know your home's condition.
               </p>
@@ -326,7 +326,7 @@ export default function HomePage() {
                   location: "Landlord · Manchester",
                 },
                 {
-                  quote: "We had an emergency over the bank holiday. TennVice had someone with us within 24 hours. Worth every penny of Premium.",
+                  quote: "We had an emergency over the bank holiday. Tennvice had someone with us within 24 hours. Worth every penny of Premium.",
                   name: "Priya M.",
                   location: "Homeowner · Birmingham",
                 },
@@ -363,7 +363,7 @@ export default function HomePage() {
               Ready to give your home a service record?
             </h2>
             <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
-              Join over 1,200 homeowners and landlords who trust TennVice to keep their properties safe, compliant, and documented.
+              Join over 1,200 homeowners and landlords who trust Tennvice to keep their properties safe, compliant, and documented.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a
