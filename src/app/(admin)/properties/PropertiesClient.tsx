@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, FileText } from "lucide-react";
 
 const tierColors: Record<string, string> = {
   BASIC:      "bg-gray-100 text-gray-700",
@@ -81,6 +81,7 @@ export default function PropertiesClient({ properties }: { properties: Property[
               <th className="text-left px-5 py-3 font-medium text-gray-500">Visits</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Next visit</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Notes</th>
+              <th className="px-5 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -142,6 +143,17 @@ export default function PropertiesClient({ properties }: { properties: Property[
                     </td>
                     <td className="px-5 py-3 text-gray-500 text-xs max-w-48 truncate">
                       {p.notes ?? <span className="text-gray-300">—</span>}
+                    </td>
+                    <td className="px-5 py-3">
+                      <a
+                        href={`/portal/report/${p.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium whitespace-nowrap"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        Service report
+                      </a>
                     </td>
                   </tr>
                 );

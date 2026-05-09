@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Calendar, Home, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -201,6 +201,13 @@ export default async function CustomerPortalPage() {
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(property as any).ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
                     {(property as any).ownershipType === "TENANT" ? "Tenant" : "Owner"}
                   </span>
+                  <Link
+                    href={`/portal/report/${property.id}`}
+                    className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium border border-brand-200 rounded-full px-2.5 py-0.5 hover:bg-brand-50 transition-colors"
+                  >
+                    <FileText className="w-3 h-3" />
+                    Service report
+                  </Link>
                 </div>
               </div>
 
