@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const adminNav = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/customers", label: "Customers", icon: Users },
-  { href: "/properties", label: "Properties", icon: Home },
-  { href: "/visits", label: "Visits", icon: Calendar },
+  { href: "/dashboard",    label: "Dashboard",    icon: LayoutDashboard },
+  { href: "/customers",    label: "Customers",    icon: Users },
+  { href: "/properties",   label: "Properties",   icon: Home },
+  { href: "/visits",       label: "Visits",       icon: Calendar },
+  { href: "/technicians",  label: "Technicians",  icon: Wrench },
 ];
 
 const customerNav = [
@@ -35,7 +36,7 @@ export default function Sidebar({ role }: { role: "ADMIN" | "TECHNICIAN" | "CUST
             href={href}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-              pathname === href
+              (href === "/dashboard" ? pathname === href : pathname.startsWith(href))
                 ? "bg-brand-50 text-brand-700"
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             )}
