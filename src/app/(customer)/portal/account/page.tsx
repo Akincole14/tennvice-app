@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AccountClient from "./AccountClient";
+import CustomerPhotoUpload from "./CustomerPhotoUpload";
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
@@ -12,7 +13,7 @@ export default async function AccountPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { name: true, email: true, phone: true },
+    select: { name: true, email: true, phone: true, image: true },
   });
 
   if (!user) redirect("/login");
@@ -23,6 +24,7 @@ export default async function AccountPage() {
         <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
         <p className="text-gray-500 mt-1">Manage your personal details and password</p>
       </div>
+      <CustomerPhotoUpload name={user.name ?? ""} currentPhoto={user.image ?? null} />
       <AccountClient user={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone }} />
     </div>
   );

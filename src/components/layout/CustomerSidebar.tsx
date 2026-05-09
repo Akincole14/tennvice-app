@@ -8,14 +8,43 @@ import { cn } from "@/lib/utils";
 
 type Property = { id: string; address: string };
 
-export default function CustomerSidebar({ properties }: { properties: Property[] }) {
+export default function CustomerSidebar({
+  properties,
+  name,
+  photo,
+}: {
+  properties: Property[];
+  name?: string;
+  photo?: string | null;
+}) {
   const pathname = usePathname();
+  const initial  = (name ?? "C").charAt(0).toUpperCase();
 
   return (
     <aside className="w-60 min-h-screen bg-white border-r border-gray-200 flex flex-col">
       <div className="px-6 py-5 border-b border-gray-100">
         <span className="text-2xl font-bold text-brand-700">TennVice</span>
       </div>
+
+      {name && (
+        <div className="px-4 py-3 mx-3 mt-3 mb-1 bg-brand-50 rounded-xl">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+              {photo ? (
+                <img src={photo} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
+                  {initial}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+              <p className="text-xs text-brand-600">Customer</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <nav className="flex-1 px-3 py-4 flex flex-col overflow-y-auto">
         <div className="space-y-1">
