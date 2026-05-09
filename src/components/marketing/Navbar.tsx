@@ -53,12 +53,12 @@ export default function Navbar() {
           >
             Sign in
           </Link>
-          <a
-            href="#pricing"
+          <Link
+            href="/register"
             className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors"
           >
             Get started
-          </a>
+          </Link>
         </div>
 
         {/* Mobile toggle */}
@@ -88,13 +88,13 @@ export default function Navbar() {
             <Link href="/login" className="text-sm font-medium text-gray-600 py-1">
               Sign in
             </Link>
-            <a
-              href="#pricing"
+            <Link
+              href="/register"
               onClick={() => setOpen(false)}
               className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-lg text-center"
             >
               Get started
-            </a>
+            </Link>
           </div>
         </div>
       )}

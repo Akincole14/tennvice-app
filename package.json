@@ -17,6 +17,7 @@
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
+    "gocardless-nodejs": "^8.1.0",
     "lucide-react": "^0.462.0",
     "next": "^16.2.6",
     "next-auth": "^4.24.10",

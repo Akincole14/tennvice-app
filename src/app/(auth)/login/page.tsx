@@ -194,9 +194,9 @@ export default function LoginPage() {
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400">
               Don't have an account?{" "}
-              <a href="#pricing" onClick={() => window.location.href = "/#pricing"} className="text-brand-600 font-medium hover:underline">
-                View our plans
-              </a>
+              <Link href="/register" className="text-brand-600 font-medium hover:underline">
+                Create one
+              </Link>
             </p>
           </div>
         </div>

@@ -83,6 +83,12 @@ model Customer {
   visitsPerYear      Int        @default(2)
   emergencyCallouts  Int        @default(0)
   discountPercent    Int        @default(20)
+  // GoCardless Direct Debit
+  gcBillingRequestId String?    // temporary reference during redirect flow
+  gcMandateId        String?    // e.g. MD0000XXXX
+  gcSubscriptionId   String?    // e.g. SB0000XXXX
+  ddStatus           String     @default("NONE")  // NONE | PENDING | ACTIVE | CANCELLED | FAILED
+  ddSetupAt          DateTime?
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   properties         Property[]
