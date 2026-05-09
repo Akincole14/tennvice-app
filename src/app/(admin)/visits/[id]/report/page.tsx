@@ -2,9 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ReportForm from "./ReportForm";
 
-export default async function ReportPage({ params }: { params: { id: string } }) {
+export default async function ReportPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const visit = await prisma.visit.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       property: {
         include: { customer: { include: { user: { select: { name: true } } } } },
