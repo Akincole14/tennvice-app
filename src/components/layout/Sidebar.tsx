@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench } from "lucide-react";
+import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench, ClipboardList } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ const adminNav = [
   { href: "/properties",   label: "Properties",   icon: Home },
   { href: "/visits",       label: "Visits",       icon: Calendar },
   { href: "/technicians",  label: "Technicians",  icon: Wrench },
+  { href: "/reports",      label: "Reports",      icon: ClipboardList },
 ];
 
 const customerNav = [
