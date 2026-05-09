@@ -67,7 +67,9 @@ Analyse this document and respond ONLY with a valid JSON object — no markdown,
     ],
   });
 
-  const text = message.content[0].type === "text" ? message.content[0].text.trim() : "";
+  const raw  = message.content[0].type === "text" ? message.content[0].text.trim() : "";
+  // Strip markdown code fences if Claude wraps the JSON
+  const text = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
   try {
     return JSON.parse(text) as CertificateAnalysis;
   } catch {
