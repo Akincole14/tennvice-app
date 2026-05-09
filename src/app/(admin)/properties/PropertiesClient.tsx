@@ -17,6 +17,7 @@ type Property = {
   address: string;
   postcode: string;
   propertyType: string;
+  ownershipType: string;
   bedrooms: number | null;
   notes: string | null;
   customer: {
@@ -73,6 +74,7 @@ export default function PropertiesClient({ properties }: { properties: Property[
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-5 py-3 font-medium text-gray-500">Address</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Type</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">Ownership</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Beds</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Customer</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Plan</th>
@@ -105,6 +107,11 @@ export default function PropertiesClient({ properties }: { properties: Property[
                       <p className="text-gray-400 text-xs">{p.postcode}</p>
                     </td>
                     <td className="px-5 py-3 text-gray-600">{p.propertyType}</td>
+                    <td className="px-5 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
+                        {p.ownershipType === "TENANT" ? "Tenant" : "Owner"}
+                      </span>
+                    </td>
                     <td className="px-5 py-3 text-gray-600">{p.bedrooms ?? "—"}</td>
                     <td className="px-5 py-3 text-gray-700">{p.customer.user.name ?? "—"}</td>
                     <td className="px-5 py-3">

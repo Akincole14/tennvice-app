@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { name, email, phone, password, subscriptionTier, address, postcode, propertyType, bedrooms } =
+  const { name, email, phone, password, subscriptionTier, address, postcode, propertyType, ownershipType, bedrooms } =
     await req.json();
 
   if (!name || !email || !password || !subscriptionTier || !address || !postcode) {
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
               address,
               postcode,
               propertyType: propertyType || "House",
+              ownershipType: ownershipType || "OWNER",
               bedrooms: bedrooms ? parseInt(bedrooms) : null,
             },
           },

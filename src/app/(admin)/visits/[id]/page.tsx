@@ -128,6 +128,9 @@ export default async function VisitDetailPage({ params }: { params: Promise<{ id
           <p className="font-semibold text-gray-900">{property.address}</p>
           <p className="text-sm text-gray-500">{property.postcode}</p>
           <p className="text-sm text-gray-500">{property.propertyType}{property.bedrooms ? ` · ${property.bedrooms} bed` : ""}</p>
+          <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${(property as any).ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
+            {(property as any).ownershipType === "TENANT" ? "Tenant" : "Owner"}
+          </span>
           {property.notes && <p className="text-xs text-gray-400 italic">{property.notes}</p>}
         </div>
 

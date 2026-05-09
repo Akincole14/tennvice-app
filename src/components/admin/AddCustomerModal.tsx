@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 
 const TIERS = ["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"] as const;
 const PROPERTY_TYPES = ["House", "Flat", "Bungalow", "Terraced", "Semi-detached", "Detached"];
+const OWNERSHIP_TYPES = [
+  { value: "OWNER",  label: "Owner" },
+  { value: "TENANT", label: "Tenant" },
+];
 
 export default function AddCustomerModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
@@ -15,7 +19,7 @@ export default function AddCustomerModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", password: "",
     subscriptionTier: "BASIC" as typeof TIERS[number],
-    address: "", postcode: "", propertyType: "House", bedrooms: "",
+    address: "", postcode: "", propertyType: "House", ownershipType: "OWNER", bedrooms: "",
   });
 
   function set(field: string, value: string) {
@@ -96,11 +100,18 @@ export default function AddCustomerModal({ onClose }: { onClose: () => void }) {
             </Field>
           </div>
 
-          <Field label="Property type">
-            <select className={inputCls} value={form.propertyType} onChange={(e) => set("propertyType", e.target.value)}>
-              {PROPERTY_TYPES.map((t) => <option key={t}>{t}</option>)}
-            </select>
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Property type">
+              <select className={inputCls} value={form.propertyType} onChange={(e) => set("propertyType", e.target.value)}>
+                {PROPERTY_TYPES.map((t) => <option key={t}>{t}</option>)}
+              </select>
+            </Field>
+            <Field label="Ownership">
+              <select className={inputCls} value={form.ownershipType} onChange={(e) => set("ownershipType", e.target.value)}>
+                {OWNERSHIP_TYPES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </Field>
+          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">

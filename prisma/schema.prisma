@@ -94,9 +94,10 @@ model Property {
   customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   address      String
   postcode     String
-  propertyType String   @default("House")
-  bedrooms     Int?
-  notes        String?
+  propertyType   String   @default("House")
+  ownershipType  String   @default("OWNER")
+  bedrooms       Int?
+  notes          String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   visits       Visit[]
