@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, LogOut } from "lucide-react";
+import { Home, FileText, LogOut, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +67,20 @@ export default function CustomerSidebar({ properties }: { properties: Property[]
           </Link>
         </div>
       </nav>
+
+      {/* Account settings — pinned above sign out */}
+      <div className="px-3 pb-1 border-t border-gray-100 pt-3">
+        <Link
+          href="/portal/account"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+            pathname.startsWith("/portal/account") ? "bg-brand-50 text-brand-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          )}
+        >
+          <Settings className="w-4 h-4 shrink-0" />
+          Account settings
+        </Link>
+      </div>
 
       <div className="px-3 py-4 border-t border-gray-100">
         <button
