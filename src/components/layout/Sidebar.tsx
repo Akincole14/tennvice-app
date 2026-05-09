@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench, ClipboardList, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -16,19 +16,49 @@ const adminNav = [
 ];
 
 const customerNav = [
-  { href: "/portal", label: "My Home", icon: Home },
+  { href: "/portal",        label: "My Home",       icon: Home },
   { href: "/portal/visits", label: "Visit History", icon: FileText },
 ];
 
-export default function Sidebar({ role }: { role: "ADMIN" | "TECHNICIAN" | "CUSTOMER" }) {
+export default function Sidebar({
+  role,
+  name,
+  photo,
+}: {
+  role: "ADMIN" | "TECHNICIAN" | "CUSTOMER";
+  name?: string;
+  photo?: string | null;
+}) {
   const pathname = usePathname();
-  const nav = role === "CUSTOMER" ? customerNav : adminNav;
+  const nav      = role === "CUSTOMER" ? customerNav : adminNav;
+  const initial  = (name ?? "A").charAt(0).toUpperCase();
 
   return (
     <aside className="w-60 min-h-screen bg-white border-r border-gray-200 flex flex-col">
       <div className="px-6 py-5 border-b border-gray-100">
         <span className="text-2xl font-bold text-brand-700">TennVice</span>
       </div>
+
+      {/* Admin identity chip */}
+      {role === "ADMIN" && name && (
+        <div className="px-4 py-3 mx-3 mt-3 mb-1 bg-brand-50 rounded-xl">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+              {photo ? (
+                <img src={photo} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
+                  {initial}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+              <p className="text-xs text-brand-600">Administrator</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <nav className="flex-1 px-3 py-4 flex flex-col">
         <div className="space-y-1">
@@ -49,7 +79,21 @@ export default function Sidebar({ role }: { role: "ADMIN" | "TECHNICIAN" | "CUST
           ))}
         </div>
 
-        <div className="mt-auto pt-3 border-t border-gray-100">
+        <div className="mt-auto pt-3 border-t border-gray-100 space-y-1">
+          {role === "ADMIN" && (
+            <Link
+              href="/account"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                pathname.startsWith("/account")
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              )}
+            >
+              <Settings className="w-4 h-4" />
+              Account settings
+            </Link>
+          )}
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 w-full transition-colors"
