@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import {
-  Users, Home, Calendar, AlertCircle,
-  PoundSterling, Clock, Zap, ClipboardList,
+  Users, Home, Calendar, AlertCircle, PoundSterling,
+  Clock, Zap, ClipboardList, TrendingUp, CheckCircle,
+  Award, Activity, Wrench, ChevronRight,
 } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
 };
 
-const VISIT_TYPE_LABELS: Record<string, string> = {
+const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Plumbing",
   ROUTINE_ELECTRICAL: "Electrical",
   ROUTINE_BOTH:       "Plumbing & Electrical",
@@ -25,13 +26,25 @@ const typeColors: Record<string, string> = {
   EMERGENCY:          "bg-red-100 text-red-700",
 };
 
+const statusColors: Record<string, string> = {
+  SCHEDULED:   "bg-blue-100 text-blue-700",
+  IN_PROGRESS: "bg-yellow-100 text-yellow-700",
+  COMPLETED:   "bg-green-100 text-green-700",
+  CANCELLED:   "bg-red-100 text-red-700",
+};
+
 async function getDashboardData() {
-  const now = new Date();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0, 0, 0, 0);
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 7);
+  const now       = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd   = new Date(todayStart); todayEnd.setDate(todayEnd.getDate() + 1);
+
+  const weekStart = new Date(todayStart);
+  weekStart.setDate(todayStart.getDate() - todayStart.getDay());
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 7);
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd   = new Date(monthStart);
 
   const visitInclude = {
     property: {
@@ -42,25 +55,41 @@ async function getDashboardData() {
 
   const [
     activeCustomers,
+    allCustomers,
     propertyCount,
     visitsThisWeek,
+    completedThisMonth,
+    newCustomersThisMonth,
+    newCustomersLastMonth,
+    todayVisits,
     upcomingVisits,
     unassignedVisits,
     unsignedReports,
     followUpVisits,
     emergencyVisits,
     tierBreakdown,
+    technicianWorkload,
+    pendingCertificates,
+    recentVisits,
+    recentCustomers,
   ] = await Promise.all([
     prisma.customer.findMany({
       where: { subscriptionStatus: "ACTIVE" },
       select: { subscriptionTier: true },
     }),
+    prisma.customer.count(),
     prisma.property.count(),
-    prisma.visit.count({
-      where: { scheduledAt: { gte: weekStart, lt: weekEnd } },
+    prisma.visit.count({ where: { scheduledAt: { gte: weekStart, lt: weekEnd } } }),
+    prisma.visit.count({ where: { status: "COMPLETED", completedAt: { gte: monthStart } } }),
+    prisma.customer.count({ where: { createdAt: { gte: monthStart } } }),
+    prisma.customer.count({ where: { createdAt: { gte: lastMonthStart, lt: lastMonthEnd } } }),
+    prisma.visit.findMany({
+      where: { scheduledAt: { gte: todayStart, lt: todayEnd }, status: { not: "CANCELLED" } },
+      include: visitInclude,
+      orderBy: { scheduledAt: "asc" },
     }),
     prisma.visit.findMany({
-      where: { status: "SCHEDULED", scheduledAt: { gte: now } },
+      where: { status: "SCHEDULED", scheduledAt: { gte: todayEnd } },
       include: visitInclude,
       orderBy: { scheduledAt: "asc" },
       take: 8,
@@ -78,65 +107,121 @@ async function getDashboardData() {
       take: 5,
     }),
     prisma.visit.findMany({
-      where: { status: "COMPLETED", report: { followUpRequired: true, signedByTechnician: false } },
+      where: { status: "COMPLETED", report: { followUpRequired: true } },
       include: visitInclude,
       orderBy: { scheduledAt: "desc" },
       take: 5,
     }),
-    prisma.visit.count({
-      where: { isEmergency: true, status: "SCHEDULED" },
-    }),
+    prisma.visit.count({ where: { isEmergency: true, status: "SCHEDULED" } }),
     prisma.customer.groupBy({
       by: ["subscriptionTier"],
       where: { subscriptionStatus: "ACTIVE" },
       _count: true,
     }),
+    prisma.technician.findMany({
+      include: {
+        user: { select: { name: true } },
+        visits: {
+          where: { status: { in: ["SCHEDULED", "IN_PROGRESS"] }, scheduledAt: { gte: now } },
+          select: { id: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.technicianCertificate.findMany({
+      where: { status: "PENDING" },
+      include: {
+        technician: { include: { user: { select: { name: true } } } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    prisma.visit.findMany({
+      include: visitInclude,
+      orderBy: { updatedAt: "desc" },
+      take: 6,
+    }),
+    prisma.customer.findMany({
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+    }),
   ]);
 
-  const mrr = activeCustomers.reduce(
-    (sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0),
-    0
-  );
+  const mrr = activeCustomers.reduce((sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0), 0);
+  const arr = mrr * 12;
+  const avgRevenue = activeCustomers.length ? Math.round(mrr / activeCustomers.length) : 0;
 
   return {
-    mrr,
+    mrr, arr, avgRevenue,
     activeCount: activeCustomers.length,
+    allCustomers,
     propertyCount,
     visitsThisWeek,
+    completedThisMonth,
+    newCustomersThisMonth,
+    newCustomersLastMonth,
+    todayVisits,
     upcomingVisits,
     unassignedVisits,
     unsignedReports,
     followUpVisits,
     emergencyVisits,
     tierBreakdown,
+    technicianWorkload,
+    pendingCertificates,
+    recentVisits,
+    recentCustomers,
   };
 }
 
 export default async function DashboardPage() {
   const d = await getDashboardData();
 
+  const now      = new Date();
+  const dateStr  = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
   const statCards = [
-    { label: "Monthly revenue",   value: `£${d.mrr.toLocaleString()}`,  icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers" },
-    { label: "Active customers",  value: d.activeCount,                 icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers" },
-    { label: "Visits this week",  value: d.visitsThisWeek,              icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits" },
-    { label: "Properties",        value: d.propertyCount,               icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties" },
-    { label: "Unsigned reports",  value: d.unsignedReports.length,      icon: ClipboardList, color: "text-amber-600 bg-amber-50",    href: "/visits" },
-    { label: "Unassigned visits", value: d.unassignedVisits.length,     icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits" },
-    { label: "Follow-ups needed", value: d.followUpVisits.length,       icon: AlertCircle,   color: "text-red-600 bg-red-50",        href: "/visits" },
-    { label: "Emergency visits",  value: d.emergencyVisits,             icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits" },
+    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,      icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers" },
+    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers" },
+    { label: "Active customers",     value: d.activeCount,                      icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers" },
+    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties" },
+    { label: "Visits this week",     value: d.visitsThisWeek,                   icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits" },
+    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits" },
+    { label: "Unassigned visits",    value: d.unassignedVisits.length,          icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits" },
+    { label: "Emergency visits",     value: d.emergencyVisits,                  icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits" },
   ];
 
-  const tierOrder = ["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"];
-  const tierColors: Record<string, string> = {
-    BASIC: "bg-gray-200", STANDARD: "bg-blue-300", PLUS: "bg-purple-400",
+  const tierOrder  = ["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"];
+  const tierBarColors: Record<string, string> = {
+    BASIC: "bg-gray-300", STANDARD: "bg-blue-400", PLUS: "bg-purple-400",
     PREMIUM: "bg-brand-500", ENTERPRISE: "bg-emerald-500",
   };
-  const tierMap = Object.fromEntries(d.tierBreakdown.map((t) => [t.subscriptionTier, t._count]));
+  const tierMap      = Object.fromEntries(d.tierBreakdown.map(t => [t.subscriptionTier, t._count]));
   const maxTierCount = Math.max(...Object.values(tierMap), 1);
+
+  const customerGrowth = d.newCustomersLastMonth > 0
+    ? Math.round(((d.newCustomersThisMonth - d.newCustomersLastMonth) / d.newCustomersLastMonth) * 100)
+    : null;
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
+        </div>
+        {d.newCustomersThisMonth > 0 && (
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
+            <TrendingUp className="w-4 h-4" />
+            <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
+            {customerGrowth !== null && (
+              <span className="text-xs text-green-500">({customerGrowth >= 0 ? "+" : ""}{customerGrowth}% vs last month)</span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -157,63 +242,104 @@ export default async function DashboardPage() {
         ))}
       </div>
 
+      {/* Today's schedule */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-gray-900">Today's schedule</h2>
+            {d.todayVisits.length > 0 && (
+              <span className="text-xs font-semibold bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">
+                {d.todayVisits.length} visit{d.todayVisits.length > 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+          <Link href="/visits" className="text-xs text-brand-600 hover:underline font-medium">View all visits</Link>
+        </div>
+        {d.todayVisits.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-gray-400 text-center">No visits scheduled for today.</p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {d.todayVisits.map(v => (
+              <Link
+                key={v.id}
+                href={`/visits/${v.id}`}
+                className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors group"
+              >
+                <div className="text-right w-14 shrink-0">
+                  <p className="text-sm font-semibold text-gray-900">
+                    {new Date(v.scheduledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+                <div className="w-px h-8 bg-gray-200 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-brand-600 truncate">
+                    {v.property.customer.user.name ?? "—"} · {v.property.address.split(",")[0]}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {v.technician ? v.technician.user.name : <span className="text-orange-500 font-medium">Unassigned</span>}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${v.isEmergency ? "bg-red-100 text-red-700" : (typeColors[v.type] ?? "bg-gray-100 text-gray-600")}`}>
+                    {v.isEmergency ? "Emergency" : (typeLabels[v.type] ?? v.type)}
+                  </span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
+                    {v.status.replace("_", " ")}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Upcoming visits + tier breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Upcoming visits</h2>
-            <Link href="/visits" className="text-xs text-brand-600 hover:underline font-medium">
-              View all
-            </Link>
+            <Link href="/visits" className="text-xs text-brand-600 hover:underline font-medium">View all</Link>
           </div>
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-left px-5 py-3 font-medium text-gray-500">Date</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-500">Customer</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-500">Type</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-500">Technician</th>
+                {["Date", "Customer", "Type", "Technician"].map(h => (
+                  <th key={h} className="text-left px-5 py-3 font-medium text-gray-500">{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {d.upcomingVisits.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-10 text-gray-400 text-sm">
-                    No upcoming visits scheduled.
+                <tr><td colSpan={4} className="text-center py-10 text-gray-400 text-sm">No upcoming visits scheduled.</td></tr>
+              ) : d.upcomingVisits.map(v => (
+                <tr key={v.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    <Link href={`/visits/${v.id}`} className="block text-gray-900 group-hover:text-brand-600 font-medium">
+                      {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                    </Link>
+                    <p className="text-xs text-gray-400">
+                      {new Date(v.scheduledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </td>
+                  <td className="px-5 py-3">
+                    <Link href={`/visits/${v.id}`} className="block">
+                      <p className="font-medium text-gray-900 group-hover:text-brand-600 truncate max-w-[160px]">
+                        {v.property.customer.user.name ?? "—"}
+                      </p>
+                      <p className="text-gray-400 text-xs truncate max-w-[160px]">{v.property.address.split(",")[0]}</p>
+                    </Link>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.isEmergency ? "bg-red-100 text-red-700" : (typeColors[v.type] ?? "bg-blue-50 text-blue-700")}`}>
+                      {v.isEmergency ? "Emergency" : (typeLabels[v.type] ?? v.type)}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-gray-600 text-sm">
+                    {v.technician ? v.technician.user.name : <span className="text-orange-500 font-medium">Unassigned</span>}
                   </td>
                 </tr>
-              ) : (
-                d.upcomingVisits.map((v) => (
-                  <tr key={v.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
-                    <td className="px-5 py-3 whitespace-nowrap">
-                      <Link href={`/visits/${v.id}`} className="block text-gray-900 group-hover:text-brand-600">
-                        {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                      </Link>
-                      <p className="text-xs text-gray-400">
-                        {new Date(v.scheduledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </td>
-                    <td className="px-5 py-3">
-                      <Link href={`/visits/${v.id}`} className="block">
-                        <p className="font-medium text-gray-900 group-hover:text-brand-600">
-                          {v.property.customer.user.name ?? "—"}
-                        </p>
-                        <p className="text-gray-400 text-xs">{v.property.address}</p>
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.isEmergency ? "bg-red-100 text-red-700" : (typeColors[v.type] ?? "bg-blue-50 text-blue-700")}`}>
-                        {v.isEmergency ? "Emergency" : (VISIT_TYPE_LABELS[v.type] ?? v.type)}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-gray-600">
-                      {v.technician ? v.technician.user.name : (
-                        <span className="text-orange-500 font-medium">Unassigned</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
@@ -221,16 +347,16 @@ export default async function DashboardPage() {
         {/* Tier breakdown */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-gray-900">Subscriptions by tier</h2>
+            <h2 className="font-semibold text-gray-900">Subscriptions</h2>
             <Link href="/customers" className="text-xs text-brand-600 hover:underline font-medium">View all</Link>
           </div>
           {d.activeCount === 0 ? (
             <p className="text-sm text-gray-400 text-center py-8">No active customers.</p>
           ) : (
             <div className="space-y-4">
-              {tierOrder.map((tier) => {
+              {tierOrder.map(tier => {
                 const count = tierMap[tier] ?? 0;
-                const pct = Math.round((count / d.activeCount) * 100);
+                const pct   = Math.round((count / d.activeCount) * 100);
                 return (
                   <div key={tier}>
                     <div className="flex items-center justify-between mb-1">
@@ -240,98 +366,184 @@ export default async function DashboardPage() {
                       <span className="text-sm text-gray-500">{count} · £{TIER_PRICES[tier]}/mo</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${tierColors[tier]}`} style={{ width: `${(count / maxTierCount) * 100}%` }} />
+                      <div className={`h-full rounded-full ${tierBarColors[tier]}`} style={{ width: `${(count / maxTierCount) * 100}%` }} />
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5">{pct}% of customers</p>
                   </div>
                 );
               })}
-              <div className="pt-3 border-t border-gray-100 flex justify-between text-sm">
-                <span className="text-gray-500 font-medium">Total MRR</span>
-                <span className="font-bold text-emerald-600">£{d.mrr.toLocaleString()}</span>
+              <div className="pt-3 border-t border-gray-100 space-y-1.5 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">MRR</span>
+                  <span className="font-bold text-emerald-600">£{d.mrr.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">ARR</span>
+                  <span className="font-bold text-emerald-600">£{d.arr.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Avg per customer</span>
+                  <span className="font-semibold text-gray-700">£{d.avgRevenue}/mo</span>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
 
+      {/* Technician workload + recent activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Technician workload */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900">Technician workload</h2>
+            <Link href="/technicians" className="text-xs text-brand-600 hover:underline font-medium">View all</Link>
+          </div>
+          {d.technicianWorkload.length === 0 ? (
+            <p className="px-6 py-8 text-sm text-gray-400 text-center">No technicians added yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {d.technicianWorkload.map(t => {
+                const count  = t.visits.length;
+                const maxLoad = 10;
+                const pct    = Math.min(Math.round((count / maxLoad) * 100), 100);
+                const barColor = count === 0 ? "bg-gray-200" : count < 4 ? "bg-green-400" : count < 7 ? "bg-amber-400" : "bg-red-400";
+                return (
+                  <Link
+                    key={t.id}
+                    href={`/technicians/${t.id}`}
+                    className="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50 transition-colors group"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-xs shrink-0">
+                      {t.user.name?.charAt(0) ?? "T"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 group-hover:text-brand-600">{t.user.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-xs text-gray-500 shrink-0">{count} upcoming</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Recent activity */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="font-semibold text-gray-900">Recent activity</h2>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {d.recentCustomers.slice(0, 2).map(c => (
+              <Link key={c.id} href="/customers" className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
+                <div className="p-1.5 bg-blue-50 rounded-lg shrink-0"><Users className="w-3.5 h-3.5 text-blue-500" /></div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-700 truncate">
+                    <span className="font-medium">{c.user.name}</span> joined as a customer
+                  </p>
+                  <p className="text-xs text-gray-400">{timeAgo(c.createdAt)}</p>
+                </div>
+              </Link>
+            ))}
+            {d.recentVisits.map(v => (
+              <Link key={v.id} href={`/visits/${v.id}`} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
+                <div className={`p-1.5 rounded-lg shrink-0 ${
+                  v.status === "COMPLETED" ? "bg-green-50" :
+                  v.status === "IN_PROGRESS" ? "bg-yellow-50" : "bg-gray-50"
+                }`}>
+                  <Calendar className={`w-3.5 h-3.5 ${
+                    v.status === "COMPLETED" ? "text-green-500" :
+                    v.status === "IN_PROGRESS" ? "text-yellow-500" : "text-gray-400"
+                  }`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-700 truncate">
+                    <span className="font-medium">{v.property.customer.user.name ?? "—"}</span>
+                    {" "}visit {v.status === "COMPLETED" ? "completed" : v.status === "IN_PROGRESS" ? "in progress" : "scheduled"}
+                  </p>
+                  <p className="text-xs text-gray-400">{timeAgo(v.updatedAt)}</p>
+                </div>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${statusColors[v.status]}`}>
+                  {v.status.replace("_", " ")}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Needs attention */}
       <div>
         <h2 className="font-semibold text-gray-900 mb-4">Needs attention</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Unassigned visits */}
-          <AttentionPanel
-            title="Unassigned visits"
-            count={d.unassignedVisits.length}
-            emptyText="All upcoming visits have a technician."
-            href="/visits"
-          >
-            {d.unassignedVisits.map((v) => (
-              <AttentionRow
-                key={v.id}
-                href={`/visits/${v.id}`}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+          <AttentionPanel title="Unassigned visits" count={d.unassignedVisits.length} emptyText="All visits have a technician." href="/visits">
+            {d.unassignedVisits.map(v => (
+              <AttentionRow key={v.id} href={`/visits/${v.id}`}
                 primary={v.property.customer.user.name ?? "—"}
-                secondary={v.property.address}
+                secondary={v.property.address.split(",")[0]}
                 badge={new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                 badgeStyle="bg-orange-50 text-orange-700"
               />
             ))}
           </AttentionPanel>
 
-          {/* Unsigned reports */}
-          <AttentionPanel
-            title="Unsigned reports"
-            count={d.unsignedReports.length}
-            emptyText="All completed visit reports are signed."
-            href="/visits"
-          >
-            {d.unsignedReports.map((v) => (
-              <AttentionRow
-                key={v.id}
-                href={`/visits/${v.id}/report`}
+          <AttentionPanel title="Unsigned reports" count={d.unsignedReports.length} emptyText="All reports are signed." href="/visits">
+            {d.unsignedReports.map(v => (
+              <AttentionRow key={v.id} href={`/visits/${v.id}/report`}
                 primary={v.property.customer.user.name ?? "—"}
-                secondary={v.property.address}
-                badge={v.technician?.user.name ?? "Unassigned"}
-                badgeStyle="bg-amber-50 text-amber-700"
+                secondary={v.technician?.user.name ?? "Unassigned"}
+                badge="Unsigned" badgeStyle="bg-amber-50 text-amber-700"
               />
             ))}
           </AttentionPanel>
 
-          {/* Follow-ups needed */}
-          <AttentionPanel
-            title="Follow-ups needed"
-            count={d.followUpVisits.length}
-            emptyText="No follow-up visits pending."
-            href="/visits"
-          >
-            {d.followUpVisits.map((v) => (
-              <AttentionRow
-                key={v.id}
-                href={`/visits/${v.id}`}
+          <AttentionPanel title="Follow-ups needed" count={d.followUpVisits.length} emptyText="No follow-up visits pending." href="/visits">
+            {d.followUpVisits.map(v => (
+              <AttentionRow key={v.id} href={`/visits/${v.id}`}
                 primary={v.property.customer.user.name ?? "—"}
-                secondary={v.property.address}
-                badge="Follow-up"
-                badgeStyle="bg-red-50 text-red-600"
+                secondary={v.property.address.split(",")[0]}
+                badge="Follow-up" badgeStyle="bg-red-50 text-red-600"
               />
             ))}
           </AttentionPanel>
 
+          <AttentionPanel title="Certificate queue" count={d.pendingCertificates.length} emptyText="No certificates pending review." href="/technicians">
+            {d.pendingCertificates.map(c => (
+              <AttentionRow key={c.id}
+                href={`/technicians/${c.technicianId}`}
+                primary={c.technician.user.name ?? "—"}
+                secondary={c.aiCertName ?? c.fileName}
+                badge={c.aiValid ? "Valid" : "Review"}
+                badgeStyle={c.aiValid ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"}
+              />
+            ))}
+          </AttentionPanel>
         </div>
       </div>
     </div>
   );
 }
 
-function AttentionPanel({
-  title, count, emptyText, href, children,
-}: {
+function timeAgo(date: Date): string {
+  const secs = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (secs < 60)   return "just now";
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+  return `${Math.floor(secs / 86400)}d ago`;
+}
+
+function AttentionPanel({ title, count, emptyText, href, children }: {
   title: string; count: number; emptyText: string; href: string; children: React.ReactNode;
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="font-medium text-gray-900">{title}</h3>
+        <h3 className="font-medium text-gray-900 text-sm">{title}</h3>
         <div className="flex items-center gap-2">
           {count > 0 && (
             <span className="text-xs font-semibold bg-red-50 text-red-600 px-2 py-0.5 rounded-full">{count}</span>
@@ -340,17 +552,15 @@ function AttentionPanel({
         </div>
       </div>
       <div className="divide-y divide-gray-100">
-        {count === 0 ? (
-          <p className="px-5 py-6 text-sm text-gray-400 text-center">{emptyText}</p>
-        ) : children}
+        {count === 0
+          ? <p className="px-5 py-6 text-sm text-gray-400 text-center">{emptyText}</p>
+          : children}
       </div>
     </div>
   );
 }
 
-function AttentionRow({
-  href, primary, secondary, badge, badgeStyle,
-}: {
+function AttentionRow({ href, primary, secondary, badge, badgeStyle }: {
   href: string; primary: string; secondary: string; badge: string; badgeStyle: string;
 }) {
   return (
@@ -359,9 +569,7 @@ function AttentionRow({
         <p className="text-sm font-medium text-gray-900 truncate">{primary}</p>
         <p className="text-xs text-gray-400 truncate">{secondary}</p>
       </div>
-      <span className={`ml-3 shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${badgeStyle}`}>
-        {badge}
-      </span>
+      <span className={`ml-3 shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${badgeStyle}`}>{badge}</span>
     </Link>
   );
 }
