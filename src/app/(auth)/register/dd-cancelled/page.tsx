@@ -5,7 +5,7 @@ import { XCircle } from "lucide-react";
 
 export default function DDCancelledPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen tv-gradient-light flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-10 max-w-sm w-full text-center">
         <XCircle className="w-14 h-14 text-orange-400 mx-auto mb-4" />
         <h1 className="text-xl font-bold text-gray-900 mb-2">Direct Debit not set up</h1>

@@ -82,15 +82,16 @@ export default function HomePage() {
       <main className="min-h-screen bg-white">
 
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-brand-50 via-white to-blue-50 pt-36 pb-24 px-6">
+        <section className="relative overflow-hidden tv-gradient-light pt-36 pb-24 px-6">
           {/* Background decoration */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-brand-100/40 blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full bg-blue-100/30 blur-3xl" />
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#F5A820]/20 blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full bg-[#4A6ED4]/15 blur-3xl" />
+            <div className="absolute top-1/2 -right-20 w-[300px] h-[300px] rounded-full bg-[#C0145C]/10 blur-3xl" />
           </div>
 
           <div className="relative max-w-5xl mx-auto text-center">
-            <span className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-brand-100 px-3 py-1.5 rounded-full mb-6">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold text-white tv-gradient-warm px-3 py-1.5 rounded-full mb-6 shadow-sm">
               <Shield className="w-3.5 h-3.5" />
               Trusted home maintenance subscription
             </span>
@@ -98,7 +99,12 @@ export default function HomePage() {
             <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6">
               Your home, always
               <br />
-              <span className="text-brand-600">in good health.</span>
+              <span
+                className="bg-clip-text text-transparent"
+                style={{ backgroundImage: "linear-gradient(135deg, #F5A820 0%, #E86515 50%, #C0145C 100%)" }}
+              >
+                in good health.
+              </span>
             </h1>
 
             <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -108,7 +114,7 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a
                 href="#pricing"
-                className="inline-flex items-center gap-2 bg-brand-600 text-white px-7 py-3.5 rounded-xl font-semibold hover:bg-brand-700 transition-colors shadow-lg shadow-brand-200"
+                className="inline-flex items-center gap-2 tv-gradient-warm text-white px-7 py-3.5 rounded-xl font-semibold transition-opacity hover:opacity-90 shadow-lg shadow-brand-200"
               >
                 See our plans <ArrowRight className="w-4 h-4" />
               </a>
@@ -222,18 +228,18 @@ export default function HomePage() {
         </section>
 
         {/* ── Services ── */}
-        <section className="py-20 px-6 bg-brand-600">
+        <section className="py-20 px-6 tv-gradient">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-white">Everything your home needs</h2>
-              <p className="text-brand-200 mt-3 text-base">One subscription, four service areas.</p>
+              <p className="text-white/70 mt-3 text-base">One subscription, four service areas.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {services.map(s => (
-                <div key={s.label} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-white border border-white/10">
-                  <s.icon className="w-7 h-7 mb-4 text-brand-200" />
+                <div key={s.label} className="bg-white/15 backdrop-blur-sm rounded-2xl p-6 text-white border border-white/20">
+                  <s.icon className="w-7 h-7 mb-4 text-white/80" />
                   <h3 className="font-semibold text-lg mb-1.5">{s.label}</h3>
-                  <p className="text-brand-100 text-sm leading-relaxed">{s.desc}</p>
+                  <p className="text-white/70 text-sm leading-relaxed">{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -343,28 +349,32 @@ export default function HomePage() {
         </section>
 
         {/* ── CTA banner ── */}
-        <section className="py-20 px-6 bg-gray-900">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold text-brand-400 bg-brand-950/50 border border-brand-800 px-3 py-1.5 rounded-full mb-6">
+        <section className="py-20 px-6 tv-gradient-dark relative overflow-hidden">
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[#E86515]/10 blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-[#4A6ED4]/10 blur-3xl" />
+          </div>
+          <div className="relative max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold text-white/80 bg-white/10 border border-white/20 px-3 py-1.5 rounded-full mb-6">
               <Home className="w-3.5 h-3.5" />
               Protect your home today
             </div>
             <h2 className="text-4xl font-bold text-white mb-5">
               Ready to give your home a service record?
             </h2>
-            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
               Join over 1,200 homeowners and landlords who trust TennVice to keep their properties safe, compliant, and documented.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <a
                 href="#pricing"
-                className="inline-flex items-center gap-2 bg-brand-600 text-white px-7 py-3.5 rounded-xl font-semibold hover:bg-brand-700 transition-colors"
+                className="inline-flex items-center gap-2 tv-gradient-warm text-white px-7 py-3.5 rounded-xl font-semibold hover:opacity-90 transition-opacity shadow-lg"
               >
                 View plans <ArrowRight className="w-4 h-4" />
               </a>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 px-7 py-3.5 rounded-xl font-medium hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center gap-2 border border-white/30 text-white/80 px-7 py-3.5 rounded-xl font-medium hover:bg-white/10 transition-colors"
               >
                 Sign in to your account
               </Link>

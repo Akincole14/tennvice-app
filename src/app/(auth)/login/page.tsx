@@ -48,7 +48,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex">
 
       {/* ── Left brand panel ── */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-700 via-brand-600 to-blue-700 flex-col justify-between p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 tv-gradient flex-col justify-between p-12 relative overflow-hidden">
         {/* Background decoration */}
         <div aria-hidden className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-2xl" />

@@ -56,7 +56,7 @@ export default function DDSuccessPage() {
   }, [billingRequestId, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen tv-gradient-light flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-10 max-w-sm w-full text-center">
         {status === "error" ? (
           <>

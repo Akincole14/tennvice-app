@@ -8,6 +8,25 @@
   }
 }
 
+@layer utilities {
+  /* Full logo spectrum — blue → cyan → amber → orange → magenta */
+  .tv-gradient {
+    background: linear-gradient(135deg, #4A6ED4 0%, #48BEDA 22%, #F5A820 50%, #E86515 72%, #C0145C 100%);
+  }
+  /* Warm side only — amber → orange → magenta */
+  .tv-gradient-warm {
+    background: linear-gradient(135deg, #F5A820 0%, #E86515 50%, #C0145C 100%);
+  }
+  /* Very light pastel tints of the logo colours — for page backgrounds */
+  .tv-gradient-light {
+    background: linear-gradient(135deg, #FFF8F0 0%, #FEECD8 25%, #ffffff 50%, #EEF2FF 75%, #E0F7FC 100%);
+  }
+  /* Dark version with the logo colours as subtle tint — for footer / dark sections */
+  .tv-gradient-dark {
+    background: linear-gradient(135deg, #1e2a5e 0%, #0e3a4a 30%, #4a1a08 65%, #3a0420 100%);
+  }
+}
+
 @media print {
   body { background: white; }
   aside, nav, .print\:hidden { display: none !important; }
