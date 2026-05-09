@@ -174,103 +174,71 @@ export default async function CustomerPortalPage() {
       </div>
 
       {/* Properties */}
-      {customer.properties.map((property) => {
+      <div>
+        <h2 className="font-semibold text-gray-900 mb-3">My properties</h2>
+        <div className="space-y-3">
+        {customer.properties.map((property) => {
         const lastCompleted = property.visits.find((v) => v.status === "COMPLETED" && v.report?.signedByTechnician);
         const nextProp = property.visits
           .filter((v) => v.status === "SCHEDULED" && new Date(v.scheduledAt) >= now)
           .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0];
         const hasFollowUp = property.visits.some((v) => v.report?.followUpRequired && !v.report.signedByTechnician);
-
         const lastChecks = lastCompleted?.report
           ? [lastCompleted.report.pipesCheck, lastCompleted.report.heatingCheck, lastCompleted.report.electricalCheck, lastCompleted.report.boilerCheck].filter(c => c !== "NOT_CHECKED")
           : [];
         const health = overallHealth(lastChecks);
 
         return (
-          <div key={property.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="font-semibold text-gray-900">{property.address}</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+          <Link
+            key={property.id}
+            href={`/portal/properties/${property.id}`}
+            className="block bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="p-2 bg-brand-50 rounded-xl shrink-0">
+                  <Home className="w-4 h-4 text-brand-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">{property.address}</p>
+                  <p className="text-sm text-gray-500">
                     {property.postcode} · {property.propertyType}
                     {(property as any).bedrooms ? ` · ${(property as any).bedrooms} bed` : ""}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0 ml-3">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(property as any).ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
-                    {(property as any).ownershipType === "TENANT" ? "Tenant" : "Owner"}
-                  </span>
-                  <Link
-                    href={`/portal/report/${property.id}`}
-                    className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium border border-brand-200 rounded-full px-2.5 py-0.5 hover:bg-brand-50 transition-colors"
-                  >
-                    <FileText className="w-3 h-3" />
-                    Service report
-                  </Link>
-                </div>
               </div>
-
-              <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                <div>
-                  <p className="text-xs text-gray-400">Last service health</p>
-                  <p className={`font-medium ${health.color}`}>{health.label}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Next visit</p>
-                  <p className="font-medium text-gray-700">
-                    {nextProp
-                      ? new Date(nextProp.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-                      : "Not scheduled"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Total visits</p>
-                  <p className="font-medium text-gray-700">{property.visits.length}</p>
-                </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {hasFollowUp && <AlertTriangle className="w-4 h-4 text-amber-500" />}
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${(property as any).ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
+                  {(property as any).ownershipType === "TENANT" ? "Tenant" : "Owner"}
+                </span>
               </div>
-
-              {hasFollowUp && (
-                <div className="flex items-center gap-2 mt-3 text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
-                  A follow-up visit has been recommended for this property.
-                </div>
-              )}
             </div>
 
-            {/* Recent visits */}
-            <div className="divide-y divide-gray-50">
-              {property.visits.slice(0, 3).map((v) => (
-                <Link
-                  key={v.id}
-                  href={`/portal/visits/${v.id}`}
-                  className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {typeLabels[v.type] ?? v.type} · {v.technician?.user.name ?? "Technician TBC"}
-                    </p>
-                  </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
-                    {v.status.replace("_", " ")}
-                  </span>
-                </Link>
-              ))}
-              {property.visits.length > 3 && (
-                <Link href="/portal/visits" className="block px-6 py-3 text-xs text-brand-600 hover:underline font-medium">
-                  View all {property.visits.length} visits →
-                </Link>
-              )}
-              {property.visits.length === 0 && (
-                <p className="px-6 py-4 text-sm text-gray-400">No visits yet for this property.</p>
-              )}
+            <div className="flex items-center gap-6 mt-4 text-sm">
+              <div>
+                <p className="text-xs text-gray-400">Health</p>
+                <p className={`font-medium ${health.color}`}>{health.label}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Next visit</p>
+                <p className="font-medium text-gray-700">
+                  {nextProp
+                    ? new Date(nextProp.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+                    : "Not scheduled"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">Total visits</p>
+                <p className="font-medium text-gray-700">{property.visits.length}</p>
+              </div>
+              <p className="ml-auto text-xs text-brand-600 font-medium">View →</p>
             </div>
-          </div>
+          </Link>
         );
       })}
+        </div>
+      </div>
     </div>
   );
 }
