@@ -35,48 +35,47 @@ export default function TechnicianSidebar({ name }: { name: string }) {
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-3 space-y-1">
-        {nav.map(({ href, label, icon: Icon, exact }) => (
+      <nav className="flex-1 px-3 py-3 flex flex-col">
+        <div className="space-y-1">
+          {nav.map(({ href, label, icon: Icon, exact }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                (exact ? pathname === href : pathname.startsWith(href))
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              )}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-auto pt-3 border-t border-gray-100 space-y-1">
           <Link
-            key={href}
-            href={href}
+            href="/tech/account"
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-              (exact ? pathname === href : pathname.startsWith(href))
+              pathname.startsWith("/tech/account")
                 ? "bg-brand-50 text-brand-700"
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             )}
           >
-            <Icon className="w-4 h-4 shrink-0" />
-            {label}
+            <Settings className="w-4 h-4 shrink-0" />
+            Account settings
           </Link>
-        ))}
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 w-full transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign out
+          </button>
+        </div>
       </nav>
-
-      <div className="px-3 pb-1 border-t border-gray-100 pt-3">
-        <Link
-          href="/tech/account"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-            pathname.startsWith("/tech/account")
-              ? "bg-brand-50 text-brand-700"
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-          )}
-        >
-          <Settings className="w-4 h-4 shrink-0" />
-          Account settings
-        </Link>
-      </div>
-
-      <div className="px-3 py-4 border-t border-gray-100">
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 w-full transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign out
-        </button>
-      </div>
     </aside>
   );
 }
