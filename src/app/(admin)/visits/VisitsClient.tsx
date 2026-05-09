@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Plus, Search, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ScheduleVisitModal from "@/components/admin/ScheduleVisitModal";
 
 const statusColors: Record<string, string> = {
@@ -34,19 +35,65 @@ type Visit = {
   status: string;
   type: string;
   isEmergency: boolean;
-  property: {
-    address: string;
-    customer: { user: { name: string | null } };
-  };
-  technician: { user: { name: string | null } } | null;
+  property: { address: string; customer: { user: { name: string | null } } };
+  technician: { id: string; user: { name: string | null } } | null;
   report: { signedByTechnician: boolean; followUpRequired: boolean } | null;
 };
 
 type Property = { id: string; address: string; postcode: string; customer: { user: { name: string | null } } };
 type Technician = { id: string; user: { name: string | null } };
 
+// ─── Inline assign widget ────────────────────────────────────────────────────
+
+function InlineAssign({ visitId, technicians, onAssigned }: {
+  visitId: string;
+  technicians: Technician[];
+  onAssigned: (visitId: string, techId: string) => void;
+}) {
+  const [techId, setTechId] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    if (!techId) return;
+    setSaving(true);
+    await fetch(`/api/visits/${visitId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ technicianId: techId }),
+    });
+    setSaving(false);
+    onAssigned(visitId, techId);
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <select
+        value={techId}
+        onChange={e => setTechId(e.target.value)}
+        className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-500 text-gray-600"
+      >
+        <option value="">Assign…</option>
+        {technicians.map(t => (
+          <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
+        ))}
+      </select>
+      {techId && (
+        <button
+          onClick={save}
+          disabled={saving}
+          className="text-xs font-medium text-brand-600 hover:text-brand-800 disabled:opacity-40"
+        >
+          {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Main client component ───────────────────────────────────────────────────
+
 export default function VisitsClient({
-  visits,
+  visits: initial,
   properties,
   technicians,
 }: {
@@ -55,68 +102,143 @@ export default function VisitsClient({
   technicians: Technician[];
 }) {
   const router = useRouter();
+  const [visits, setVisits] = useState(initial);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [emergencyOnly, setEmergencyOnly] = useState(false);
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [techFilter, setTechFilter] = useState("ALL");
+  const [period, setPeriod] = useState("ALL");
 
-  const filtered = visits.filter((v) => {
+  // Sync when server refreshes props (e.g. after router.refresh())
+  useEffect(() => setVisits(initial), [initial]);
+
+  // Stats computed over all visits (unfiltered)
+  const stats = useMemo(() => ({
+    total:      visits.length,
+    upcoming:   visits.filter(v => v.status === "SCHEDULED").length,
+    inProgress: visits.filter(v => v.status === "IN_PROGRESS").length,
+    completed:  visits.filter(v => v.status === "COMPLETED").length,
+    cancelled:  visits.filter(v => v.status === "CANCELLED").length,
+    emergency:  visits.filter(v => v.isEmergency).length,
+  }), [visits]);
+
+  // Date-period helpers (computed once per render — stable enough for filtering)
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const todayEnd   = todayStart + 86_400_000;
+  const daysFromMon = (now.getDay() + 6) % 7;
+  const weekStart  = todayStart - daysFromMon * 86_400_000;
+  const weekEnd    = weekStart + 7 * 86_400_000;
+  const nextWeekStart = weekEnd;
+  const nextWeekEnd   = nextWeekStart + 7 * 86_400_000;
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
+
+  function inPeriod(d: Date): boolean {
+    const t = new Date(d).getTime();
+    if (period === "TODAY")      return t >= todayStart && t < todayEnd;
+    if (period === "THIS_WEEK")  return t >= weekStart  && t < weekEnd;
+    if (period === "NEXT_WEEK")  return t >= nextWeekStart && t < nextWeekEnd;
+    if (period === "THIS_MONTH") return t >= monthStart && t < monthEnd;
+    return true;
+  }
+
+  const filtered = useMemo(() => visits.filter(v => {
     const q = search.toLowerCase();
-    const matchesSearch =
-      !q ||
-      v.property.customer.user.name?.toLowerCase().includes(q) ||
-      v.property.address.toLowerCase().includes(q);
-    const matchesStatus = statusFilter === "ALL" || v.status === statusFilter;
-    const matchesType = typeFilter === "ALL" || v.type === typeFilter;
-    const matchesTech =
-      techFilter === "ALL" ||
-      (techFilter === "UNASSIGNED" && !v.technician) ||
-      v.technician?.user.name === techFilter;
-    return matchesSearch && matchesStatus && matchesType && matchesTech;
-  });
+    if (q && !v.property.customer.user.name?.toLowerCase().includes(q) && !v.property.address.toLowerCase().includes(q)) return false;
+    if (statusFilter !== "ALL" && v.status !== statusFilter) return false;
+    if (emergencyOnly && !v.isEmergency) return false;
+    if (typeFilter !== "ALL" && v.type !== typeFilter) return false;
+    if (techFilter === "UNASSIGNED" && v.technician) return false;
+    if (techFilter !== "ALL" && techFilter !== "UNASSIGNED" && v.technician?.id !== techFilter) return false;
+    if (!inPeriod(v.scheduledAt)) return false;
+    return true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [visits, search, statusFilter, emergencyOnly, typeFilter, techFilter, period]);
+
+  function handleTileClick(filter: string) {
+    if (filter === "EMERGENCY") {
+      setEmergencyOnly(e => !e);
+    } else {
+      setStatusFilter(f => f === filter ? "ALL" : filter);
+      setEmergencyOnly(false);
+    }
+  }
+
+  function isTileActive(filter: string) {
+    if (filter === "EMERGENCY") return emergencyOnly;
+    if (filter === "ALL")       return statusFilter === "ALL" && !emergencyOnly;
+    return statusFilter === filter;
+  }
+
+  function handleAssign(visitId: string, techId: string) {
+    const tech = technicians.find(t => t.id === techId);
+    setVisits(vs => vs.map(v =>
+      v.id === visitId
+        ? { ...v, technician: tech ? { id: tech.id, user: { name: tech.user.name } } : null }
+        : v,
+    ));
+    router.refresh();
+  }
+
+  const tiles = [
+    { filter: "ALL",         label: "Total",       value: stats.total,      color: "text-gray-900"   },
+    { filter: "SCHEDULED",   label: "Upcoming",    value: stats.upcoming,   color: "text-blue-600"   },
+    { filter: "IN_PROGRESS", label: "In progress", value: stats.inProgress, color: "text-yellow-600" },
+    { filter: "COMPLETED",   label: "Completed",   value: stats.completed,  color: "text-green-600"  },
+    { filter: "CANCELLED",   label: "Cancelled",   value: stats.cancelled,  color: "text-red-500"    },
+    { filter: "EMERGENCY",   label: "Emergency",   value: stats.emergency,  color: "text-rose-600"   },
+  ];
 
   return (
     <>
+      {/* Stat tiles — clickable filters */}
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+        {tiles.map(({ filter, label, value, color }) => (
+          <button
+            key={filter}
+            onClick={() => handleTileClick(filter)}
+            className={`bg-white rounded-2xl border px-5 py-4 text-left transition-all ${
+              isTileActive(filter)
+                ? "border-brand-400 ring-2 ring-brand-100"
+                : "border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            <p className={`text-2xl font-bold ${color}`}>{value}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+          </button>
+        ))}
+      </div>
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder="Search by customer or address…"
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option value="ALL">All statuses</option>
-          <option value="SCHEDULED">Scheduled</option>
-          <option value="IN_PROGRESS">In progress</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
+        <select value={period} onChange={e => setPeriod(e.target.value)} className={selectCls}>
+          <option value="ALL">All time</option>
+          <option value="TODAY">Today</option>
+          <option value="THIS_WEEK">This week</option>
+          <option value="NEXT_WEEK">Next week</option>
+          <option value="THIS_MONTH">This month</option>
         </select>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
+        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className={selectCls}>
           <option value="ALL">All types</option>
           {Object.entries(typeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
         </select>
-        <select
-          value={techFilter}
-          onChange={(e) => setTechFilter(e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
+        <select value={techFilter} onChange={e => setTechFilter(e.target.value)} className={selectCls}>
           <option value="ALL">All technicians</option>
           <option value="UNASSIGNED">Unassigned</option>
-          {technicians.map((t) => (
-            <option key={t.id} value={t.user.name ?? ""}>{t.user.name ?? "Unnamed"}</option>
+          {technicians.map(t => (
+            <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
           ))}
         </select>
         <button
@@ -149,7 +271,7 @@ export default function VisitsClient({
                 </td>
               </tr>
             ) : (
-              filtered.map((v) => (
+              filtered.map(v => (
                 <tr
                   key={v.id}
                   onClick={() => router.push(`/visits/${v.id}`)}
@@ -173,9 +295,15 @@ export default function VisitsClient({
                       )}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-gray-600">
-                    {v.technician ? v.technician.user.name : (
-                      <span className="text-orange-500 font-medium">Unassigned</span>
+                  <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
+                    {v.technician ? (
+                      <span className="text-gray-700">{v.technician.user.name}</span>
+                    ) : (
+                      <InlineAssign
+                        visitId={v.id}
+                        technicians={technicians}
+                        onAssigned={handleAssign}
+                      />
                     )}
                   </td>
                   <td className="px-5 py-3">
@@ -183,7 +311,7 @@ export default function VisitsClient({
                       {v.status.replace("_", " ")}
                     </span>
                   </td>
-                  <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-5 py-3" onClick={e => e.stopPropagation()}>
                     {v.report ? (
                       <div className="flex flex-col gap-1">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium w-fit ${v.report.signedByTechnician ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
@@ -194,12 +322,9 @@ export default function VisitsClient({
                         )}
                       </div>
                     ) : v.status === "COMPLETED" || v.status === "IN_PROGRESS" ? (
-                      <a
-                        href={`/visits/${v.id}/report`}
-                        className="text-brand-600 text-xs font-medium hover:underline"
-                      >
+                      <Link href={`/visits/${v.id}/report`} className="text-brand-600 text-xs font-medium hover:underline">
                         Add report
-                      </a>
+                      </Link>
                     ) : (
                       <span className="text-gray-300 text-xs">—</span>
                     )}
@@ -224,3 +349,5 @@ export default function VisitsClient({
     </>
   );
 }
+
+const selectCls = "text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500";

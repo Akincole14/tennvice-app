@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Home, User, Wrench, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Home, User, Wrench, AlertTriangle } from "lucide-react";
 import VisitStatusControls from "./VisitStatusControls";
+import VisitActions from "./VisitActions";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine — Plumbing",
@@ -36,20 +37,25 @@ const checkColors: Record<string, string> = {
 
 export default async function VisitDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const visit = await prisma.visit.findUnique({
-    where: { id },
-    include: {
-      property: {
-        include: {
-          customer: {
-            include: { user: { select: { name: true, email: true, phone: true } } },
+  const [visit, technicians] = await Promise.all([
+    prisma.visit.findUnique({
+      where: { id },
+      include: {
+        property: {
+          include: {
+            customer: {
+              include: { user: { select: { name: true, email: true, phone: true } } },
+            },
           },
         },
+        technician: { include: { user: { select: { name: true, email: true } } } },
+        report: true,
       },
-      technician: { include: { user: { select: { name: true, email: true } } } },
-      report: true,
-    },
-  });
+    }),
+    prisma.technician.findMany({
+      select: { id: true, user: { select: { name: true } } },
+    }),
+  ]);
 
   if (!visit) notFound();
 
@@ -102,6 +108,13 @@ export default async function VisitDetailPage({ params }: { params: Promise<{ id
           <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[visit.status]}`}>
             {visit.status.replace("_", " ")}
           </span>
+          <VisitActions
+            visitId={visit.id}
+            type={visit.type}
+            scheduledAt={visit.scheduledAt}
+            technicianId={visit.technician?.id ?? null}
+            technicians={technicians}
+          />
         </div>
       </div>
 
