@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Award, MoreHorizontal, Settings, LogOut, X } from "lucide-react";
+import { LayoutDashboard, Calendar, Award, Settings, LogOut, X } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
-const tabItems = [
-  { href: "/tech",              label: "Dashboard",   icon: LayoutDashboard, exact: true },
-  { href: "/tech/visits",       label: "Visits",      icon: Calendar,        exact: false },
+const navItems = [
+  { href: "/tech",              label: "Dashboard",    icon: LayoutDashboard, exact: true  },
+  { href: "/tech/visits",       label: "Visits",       icon: Calendar,        exact: false },
   { href: "/tech/certificates", label: "Certificates", icon: Award,           exact: false },
 ];
 
@@ -27,12 +27,10 @@ export default function MobileTechnicianNav({
   const isActive = (href: string, exact: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
 
-  const moreActive = pathname.startsWith("/tech/account");
-
   return (
     <>
       {/* ── Top header ── */}
-      <header className="md:hidden fixed top-0 inset-x-0 z-40 bg-white border-b border-gray-200 px-4 h-14 flex items-center justify-between">
+      <header className="md:hidden fixed top-0 inset-x-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
         <div>
           <span className="text-xl font-bold text-brand-700">Tennvice</span>
           <span className="ml-2 text-xs text-gray-400">Technician</span>
@@ -52,35 +50,26 @@ export default function MobileTechnicianNav({
         </button>
       </header>
 
-      {/* ── Bottom tab bar ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 flex items-stretch">
-        {tabItems.map(({ href, label, icon: Icon, exact }) => {
+      {/* ── Nav row ── */}
+      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex overflow-x-auto">
+        {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (
             <Link
               key={href}
               href={href}
               className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors",
-                active ? "text-brand-600" : "text-gray-400"
+                "flex-shrink-0 flex flex-col items-center gap-0.5 px-5 py-2.5 border-b-2 transition-colors",
+                active
+                  ? "border-brand-500 text-brand-600"
+                  : "border-transparent text-gray-500 hover:text-gray-800"
               )}
             >
-              <Icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
-              <span className="text-[10px] font-medium leading-none">{label}</span>
+              <Icon className="w-4 h-4" />
+              <span className="text-[11px] font-medium whitespace-nowrap">{label}</span>
             </Link>
           );
         })}
-        <button
-          onClick={() => setOpen(true)}
-          className={cn(
-            "flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors",
-            moreActive || open ? "text-brand-600" : "text-gray-400"
-          )}
-          aria-label="More options"
-        >
-          <MoreHorizontal className="w-5 h-5" />
-          <span className="text-[10px] font-medium leading-none">More</span>
-        </button>
       </nav>
 
       {/* ── More sheet ── */}
@@ -91,14 +80,12 @@ export default function MobileTechnicianNav({
         )}
       >
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
-
         <div
           className={cn(
             "absolute bottom-0 inset-x-0 bg-white rounded-t-3xl shadow-2xl transition-transform duration-300 ease-out",
             open ? "translate-y-0" : "translate-y-full"
           )}
         >
-          {/* Sheet header */}
           <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
@@ -115,35 +102,23 @@ export default function MobileTechnicianNav({
                 <p className="text-xs text-brand-600">Technician</p>
               </div>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 transition-colors"
-              aria-label="Close"
-            >
+            <button onClick={() => setOpen(false)} className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <nav className="px-4 py-3 space-y-1">
-            <Link
-              href="/tech/account"
-              onClick={() => setOpen(false)}
-              className={cn(
-                "flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors",
-                moreActive ? "bg-brand-50 text-brand-700" : "text-gray-700 hover:bg-gray-50"
-              )}
+            <Link href="/tech/account" onClick={() => setOpen(false)}
+              className={cn("flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors",
+                pathname.startsWith("/tech/account") ? "bg-brand-50 text-brand-700" : "text-gray-700 hover:bg-gray-50")}
             >
-              <div className={cn(
-                "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
-                moreActive ? "bg-brand-100" : "bg-gray-100"
-              )}>
+              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+                pathname.startsWith("/tech/account") ? "bg-brand-100" : "bg-gray-100")}>
                 <Settings className="w-4 h-4" />
               </div>
               <span className="text-base font-semibold">Account settings</span>
             </Link>
-
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
+            <button onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex items-center gap-4 px-4 py-3.5 rounded-2xl w-full text-left text-red-600 hover:bg-red-50 transition-colors"
             >
               <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
@@ -152,7 +127,6 @@ export default function MobileTechnicianNav({
               <span className="text-base font-semibold">Sign out</span>
             </button>
           </nav>
-
           <div className="h-6" />
         </div>
       </div>

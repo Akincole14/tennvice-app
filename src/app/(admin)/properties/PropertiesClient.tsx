@@ -67,8 +67,49 @@ export default function PropertiesClient({ properties }: { properties: Property[
         </select>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Mobile cards */}
+      <div className="md:hidden bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
+        {filtered.length === 0 ? (
+          <p className="text-center py-12 text-sm text-gray-400">No properties match your search.</p>
+        ) : filtered.map(p => {
+          const now = new Date();
+          const completed = p.visits.filter(v => v.status === "COMPLETED").length;
+          const scheduled = p.visits.filter(v => v.status === "SCHEDULED").length;
+          const nextVisit = p.visits.find(v => v.status === "SCHEDULED" && new Date(v.scheduledAt) >= now);
+          return (
+            <div key={p.id} className="px-4 py-4">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">{p.address.split(",")[0]}</p>
+                  <p className="text-xs text-gray-400">{p.postcode}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[p.customer.subscriptionTier]}`}>
+                    {p.customer.subscriptionTier.charAt(0) + p.customer.subscriptionTier.slice(1).toLowerCase()}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
+                    {p.ownershipType === "TENANT" ? "Tenant" : "Owner"}
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mb-1">{p.customer.user.name ?? "—"} · {p.propertyType}{p.bedrooms ? ` · ${p.bedrooms} bed` : ""}</p>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                {completed > 0 && <span className="text-green-600 font-medium">{completed} done</span>}
+                {scheduled > 0 && <span className="text-blue-600 font-medium">{scheduled} scheduled</span>}
+                <span className="ml-auto">
+                  {nextVisit
+                    ? "Next: " + new Date(nextVisit.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+                    : "No upcoming visit"}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+        <div className="px-4 py-3 text-xs text-gray-400">Showing {filtered.length} of {properties.length} properties</div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">

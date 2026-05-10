@@ -130,21 +130,21 @@ export default function TechniciansClient({ technicians: initial }: { technician
 
       <div className="space-y-4">
         {/* Toolbar */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by name, email or licence…"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              placeholder="Search technicians…"
+              className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" /> Add technician
+            <Plus className="w-4 h-4" /> <span>Add</span>
           </button>
         </div>
 
@@ -154,13 +154,46 @@ export default function TechniciansClient({ technicians: initial }: { technician
           </div>
         )}
 
-        {/* Table */}
+        {/* Mobile cards */}
+        <div className="md:hidden bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
+          {filtered.length === 0 ? (
+            <p className="text-center py-12 text-sm text-gray-400">No technicians match your search.</p>
+          ) : filtered.map(t => {
+            const now = new Date();
+            const completed = t.visits.filter(v => v.status === "COMPLETED").length;
+            const upcoming  = t.visits.filter(v => v.status === "SCHEDULED" && new Date(v.scheduledAt) >= now).length;
+            const lastVisit = t.visits.find(v => v.status === "COMPLETED");
+            return (
+              <Link key={t.id} href={`/technicians/${t.id}`} className="flex items-center gap-3 px-4 py-4 hover:bg-gray-50 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm shrink-0">
+                  {t.user.name?.charAt(0) ?? "T"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">{t.user.name ?? "—"}</p>
+                  <p className="text-xs text-gray-500 truncate">{t.user.email}</p>
+                  {t.qualification && <p className="text-xs text-gray-400 truncate mt-0.5">{t.qualification}</p>}
+                </div>
+                <div className="text-right shrink-0 space-y-1">
+                  <p className="text-xs font-semibold text-green-600">{completed} done</p>
+                  <p className="text-xs font-semibold text-blue-600">{upcoming} upcoming</p>
+                  {lastVisit && (
+                    <p className="text-[10px] text-gray-400">
+                      {new Date(lastVisit.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-200 px-6 py-12 text-center text-sm text-gray-400">
+          <div className="hidden md:block bg-white rounded-2xl border border-gray-200 px-6 py-12 text-center text-sm text-gray-400">
             No technicians match your search.
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100">

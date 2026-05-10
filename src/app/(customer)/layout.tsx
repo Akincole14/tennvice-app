@@ -33,7 +33,7 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         name={dbUser?.name ?? undefined}
         photo={dbUser?.image ?? null}
       />
-      <main className="flex-1 bg-gray-50 pt-14 pb-20 px-4 md:pt-0 md:pb-0 md:px-0 md:p-8">
+      <main className="flex-1 bg-gray-50 pt-[100px] px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
         {children}
       </main>
     </div>

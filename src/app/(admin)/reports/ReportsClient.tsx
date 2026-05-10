@@ -152,18 +152,18 @@ export default function ReportsClient({
   return (
     <>
       {/* Stat tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
         {statTiles.map(({ label, value, color, filter }) => (
           <button
             key={filter}
             onClick={() => setStatusFilter(f => f === filter ? "ALL" : filter)}
-            className={`bg-white rounded-2xl border px-5 py-4 text-left transition-all ${
+            className={`bg-white rounded-2xl border px-3 py-3 md:px-5 md:py-4 text-left transition-all ${
               statusFilter === filter
                 ? "border-brand-400 ring-2 ring-brand-100"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
+            <p className={`text-xl md:text-2xl font-bold ${color}`}>{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </button>
         ))}
@@ -186,46 +186,82 @@ export default function ReportsClient({
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by customer or address…"
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
+      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-3">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search reports…"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={`shrink-0 ${selectCls}`}>
+            <option value="ALL">All visits</option>
+            <option value="NEEDS_REPORT">Needs report</option>
+            <option value="UNSIGNED">Unsigned</option>
+            <option value="SIGNED">Signed</option>
+            <option value="FOLLOW_UP">Follow-ups</option>
+            <option disabled>──────────</option>
+            <option value="SCHEDULED">Scheduled</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
         </div>
-
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={selectCls}>
-          <option value="ALL">All visits</option>
-          <option value="NEEDS_REPORT">Needs report</option>
-          <option value="UNSIGNED">Unsigned drafts</option>
-          <option value="SIGNED">Signed reports</option>
-          <option value="FOLLOW_UP">Follow-ups</option>
-          <option disabled>──────────</option>
-          <option value="SCHEDULED">Scheduled</option>
-          <option value="IN_PROGRESS">In progress</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
-
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className={selectCls}>
-          <option value="ALL">All types</option>
-          {Object.entries(typeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-        </select>
-
-        <select value={techFilter} onChange={e => setTechFilter(e.target.value)} className={selectCls}>
-          <option value="ALL">All technicians</option>
-          <option value="UNASSIGNED">Unassigned</option>
-          {technicians.map(t => (
-            <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
-          ))}
-        </select>
+        <div className="hidden md:flex gap-3">
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className={selectCls}>
+            <option value="ALL">All types</option>
+            {Object.entries(typeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+          <select value={techFilter} onChange={e => setTechFilter(e.target.value)} className={selectCls}>
+            <option value="ALL">All technicians</option>
+            <option value="UNASSIGNED">Unassigned</option>
+            {technicians.map(t => (
+              <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Mobile cards */}
+      <div className="md:hidden bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
+        {filtered.length === 0 ? (
+          <p className="text-center py-12 text-sm text-gray-400">No visits match your filters.</p>
+        ) : filtered.map(v => (
+          <div key={v.id} className="px-4 py-4">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 truncate">{v.property.customer.user.name ?? "—"}</p>
+                <p className="text-xs text-gray-400 truncate">{v.property.address.split(",")[0]}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-medium text-gray-700">
+                  {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {new Date(v.scheduledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[v.type] ?? "bg-gray-100 text-gray-600"}`}>
+                {typeLabels[v.type] ?? v.type}
+              </span>
+              {reportBadge(v)}
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-500">{v.technician?.user.name ?? <span className="text-orange-500">Unassigned</span>}</p>
+              <div onClick={e => e.stopPropagation()}>{reportAction(v)}</div>
+            </div>
+          </div>
+        ))}
+        <div className="px-4 py-3 text-xs text-gray-400">Showing {filtered.length} of {visits.length} visits</div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
