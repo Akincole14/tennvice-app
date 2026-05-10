@@ -51,7 +51,7 @@ export default function MobileTechnicianNav({
       </header>
 
       {/* ── Nav row ── */}
-      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex overflow-x-auto">
+      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex overflow-x-auto h-12">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (

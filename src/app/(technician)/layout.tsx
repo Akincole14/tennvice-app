@@ -21,7 +21,7 @@ export default async function TechnicianLayout({ children }: { children: React.R
     <div className="flex min-h-screen">
       <TechnicianSidebar name={user.name ?? "Technician"} photo={dbUser?.image ?? null} />
       <MobileTechnicianNav name={user.name ?? "Technician"} photo={dbUser?.image ?? null} />
-      <main className="flex-1 bg-gray-50 pt-[100px] px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
+      <main className="flex-1 bg-gray-50 pt-[116px] px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
         {children}
       </main>
     </div>
