@@ -21,7 +21,7 @@ export default function CustomerSidebar({
   const initial  = (name ?? "C").charAt(0).toUpperCase();
 
   return (
-    <aside className="w-60 min-h-screen bg-white border-r border-gray-200 flex flex-col">
+    <aside className="hidden md:flex w-60 min-h-screen bg-white border-r border-gray-200 flex-col">
       <div className="px-6 py-5 border-b border-gray-100">
         <span className="text-2xl font-bold text-brand-700">Tennvice</span>
       </div>

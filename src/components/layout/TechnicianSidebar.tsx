@@ -16,7 +16,7 @@ export default function TechnicianSidebar({ name, photo }: { name: string; photo
   const pathname = usePathname();
 
   return (
-    <aside className="w-60 min-h-screen bg-white border-r border-gray-200 flex flex-col">
+    <aside className="hidden md:flex w-60 min-h-screen bg-white border-r border-gray-200 flex-col">
       <div className="px-6 py-5 border-b border-gray-100">
         <span className="text-2xl font-bold text-brand-700">Tennvice</span>
         <p className="text-xs text-gray-400 mt-0.5">Technician portal</p>

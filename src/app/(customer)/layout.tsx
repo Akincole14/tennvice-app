@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import CustomerSidebar from "@/components/layout/CustomerSidebar";
+import MobileCustomerNav from "@/components/layout/MobileCustomerNav";
 
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -27,7 +28,14 @@ export default async function CustomerLayout({ children }: { children: React.Rea
         name={dbUser?.name ?? undefined}
         photo={dbUser?.image ?? null}
       />
-      <main className="flex-1 p-8 bg-gray-50">{children}</main>
+      <MobileCustomerNav
+        properties={properties}
+        name={dbUser?.name ?? undefined}
+        photo={dbUser?.image ?? null}
+      />
+      <main className="flex-1 bg-gray-50 pt-14 pb-20 px-4 md:pt-0 md:pb-0 md:px-0 md:p-8">
+        {children}
+      </main>
     </div>
   );
 }
