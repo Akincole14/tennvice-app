@@ -65,7 +65,7 @@ export default function MobileTechnicianNav({
                   : "border-transparent text-gray-500 hover:text-gray-800"
               )}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-5 h-5" />
               <span className="text-[11px] font-medium whitespace-nowrap">{label}</span>
             </Link>
           );
