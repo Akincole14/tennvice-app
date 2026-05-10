@@ -96,8 +96,51 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Mobile card list */}
+      <div className="md:hidden bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
+        {filtered.length === 0 ? (
+          <p className="text-center py-12 text-sm text-gray-400">No customers match your filters.</p>
+        ) : filtered.map((c) => {
+          const lastVisit = c.properties
+            .flatMap((p) => p.visits)
+            .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0];
+          return (
+            <div key={c.id} className="px-4 py-4">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">{c.user.name ?? "—"}</p>
+                  <p className="text-sm text-gray-500 truncate">{c.user.email}</p>
+                  {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[c.subscriptionTier]}`}>
+                    {c.subscriptionTier.charAt(0) + c.subscriptionTier.slice(1).toLowerCase()} — £{TIER_PRICES[c.subscriptionTier]}/mo
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[c.subscriptionStatus]}`}>
+                    {c.subscriptionStatus.charAt(0) + c.subscriptionStatus.slice(1).toLowerCase()}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                <span>{c.properties.length} propert{c.properties.length === 1 ? "y" : "ies"}</span>
+                <span>{c.visitsPerYear} visits/yr</span>
+                <span>{c.discountPercent}% off</span>
+                <span className="ml-auto">
+                  Last: {lastVisit
+                    ? new Date(lastVisit.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+                    : "none"}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+        <div className="px-4 py-3 text-xs text-gray-400">
+          Showing {filtered.length} of {customers.length} customers
+        </div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
@@ -124,7 +167,6 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
                 const lastVisit = c.properties
                   .flatMap((p) => p.visits)
                   .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0];
-
                 return (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3 font-medium text-gray-900">{c.user.name ?? "—"}</td>
@@ -147,15 +189,11 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
                     <td className="px-5 py-3 text-gray-600">{c.properties.length}</td>
                     <td className="px-5 py-3 text-gray-500 text-xs">
                       {lastVisit
-                        ? new Date(lastVisit.scheduledAt).toLocaleDateString("en-GB", {
-                            day: "numeric", month: "short", year: "numeric",
-                          })
+                        ? new Date(lastVisit.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
                         : "No visits yet"}
                     </td>
                     <td className="px-5 py-3 text-gray-500 text-xs">
-                      {new Date(c.user.createdAt).toLocaleDateString("en-GB", {
-                        day: "numeric", month: "short", year: "numeric",
-                      })}
+                      {new Date(c.user.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     </td>
                   </tr>
                 );

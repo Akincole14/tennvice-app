@@ -250,8 +250,69 @@ export default function VisitsClient({
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Mobile card list */}
+      <div className="md:hidden bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
+        {filtered.length === 0 ? (
+          <p className="text-center py-12 text-sm text-gray-400">No visits match your filters.</p>
+        ) : filtered.map(v => (
+          <div
+            key={v.id}
+            onClick={() => router.push(`/visits/${v.id}`)}
+            className="px-4 py-4 cursor-pointer active:bg-gray-50"
+          >
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 truncate">{v.property.customer.user.name ?? "—"}</p>
+                <p className="text-xs text-gray-400 truncate">{v.property.address}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-medium text-gray-700">
+                  {new Date(v.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {new Date(v.scheduledAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[v.type] ?? "bg-gray-100 text-gray-600"}`}>
+                {typeLabels[v.type] ?? v.type}
+              </span>
+              {v.isEmergency && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Emergency</span>
+              )}
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[v.status]}`}>
+                {v.status.replace("_", " ")}
+              </span>
+              {v.report && (
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.report.signedByTechnician ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                  {v.report.signedByTechnician ? "Signed" : "Unsigned"}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
+              <div className="text-xs text-gray-500">
+                {v.technician ? (
+                  <span>{v.technician.user.name}</span>
+                ) : (
+                  <InlineAssign visitId={v.id} technicians={technicians} onAssigned={handleAssign} />
+                )}
+              </div>
+              {!v.report && (v.status === "COMPLETED" || v.status === "IN_PROGRESS") && (
+                <Link href={`/visits/${v.id}/report`} className="text-brand-600 text-xs font-medium hover:underline">
+                  Add report
+                </Link>
+              )}
+            </div>
+          </div>
+        ))}
+        <div className="px-4 py-3 text-xs text-gray-400">
+          Showing {filtered.length} of {visits.length} visits
+        </div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
@@ -299,11 +360,7 @@ export default function VisitsClient({
                     {v.technician ? (
                       <span className="text-gray-700">{v.technician.user.name}</span>
                     ) : (
-                      <InlineAssign
-                        visitId={v.id}
-                        technicians={technicians}
-                        onAssigned={handleAssign}
-                      />
+                      <InlineAssign visitId={v.id} technicians={technicians} onAssigned={handleAssign} />
                     )}
                   </td>
                   <td className="px-5 py-3">
