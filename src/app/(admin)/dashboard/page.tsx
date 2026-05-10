@@ -181,14 +181,15 @@ export default async function DashboardPage() {
   const now      = new Date();
   const dateStr  = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
+  // First 4 shown on mobile; all 8 shown on desktop
   const statCards = [
     { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,      icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers" },
-    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers" },
     { label: "Active customers",     value: d.activeCount,                      icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers" },
-    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties" },
     { label: "Visits this week",     value: d.visitsThisWeek,                   icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits" },
-    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits" },
     { label: "Unassigned visits",    value: d.unassignedVisits.length,          icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits" },
+    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers" },
+    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties" },
+    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits" },
     { label: "Emergency visits",     value: d.emergencyVisits,                  icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits" },
   ];
 
@@ -213,7 +214,7 @@ export default async function DashboardPage() {
           <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
         </div>
         {d.newCustomersThisMonth > 0 && (
-          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
+          <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
             <TrendingUp className="w-4 h-4" />
             <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
             {customerGrowth !== null && (
@@ -223,19 +224,19 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {statCards.map(({ label, value, icon: Icon, color, href }) => (
+      {/* Stat cards — first 4 on mobile, all 8 on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {statCards.map(({ label, value, icon: Icon, color, href }, i) => (
           <Link
             key={label}
             href={href}
-            className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center gap-4 hover:border-gray-300 hover:shadow-sm transition-all"
+            className={`bg-white rounded-2xl border border-gray-200 p-3 md:p-5 items-center gap-3 md:gap-4 hover:border-gray-300 hover:shadow-sm transition-all ${i >= 4 ? "hidden md:flex" : "flex"}`}
           >
-            <div className={`p-3 rounded-xl shrink-0 ${color}`}>
-              <Icon className="w-5 h-5" />
+            <div className={`p-2 md:p-3 rounded-xl shrink-0 ${color}`}>
+              <Icon className="w-4 h-4 md:w-5 md:h-5" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-900">{value}</p>
               <p className="text-xs text-gray-500 leading-tight">{label}</p>
             </div>
           </Link>
@@ -294,8 +295,23 @@ export default async function DashboardPage() {
         )}
       </div>
 
+      {/* Mobile quick-nav */}
+      <div className="md:hidden grid grid-cols-3 gap-3">
+        {[
+          { href: "/customers",   icon: Users,    label: "Customers",   count: d.activeCount,              color: "text-blue-500"   },
+          { href: "/visits",      icon: Calendar, label: "Visits",      count: d.visitsThisWeek,            color: "text-purple-500" },
+          { href: "/technicians", icon: Wrench,   label: "Technicians", count: d.technicianWorkload.length, color: "text-brand-500"  },
+        ].map(({ href, icon: Icon, label, count, color }) => (
+          <Link key={href} href={href} className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-col items-center gap-1.5 text-center hover:border-gray-300 transition-all">
+            <Icon className={`w-5 h-5 ${color}`} />
+            <p className="text-lg font-bold text-gray-900">{count}</p>
+            <p className="text-xs text-gray-500">{label}</p>
+          </Link>
+        ))}
+      </div>
+
       {/* Upcoming visits + tier breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Upcoming visits</h2>
@@ -392,7 +408,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Technician workload + recent activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Technician workload */}
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -478,7 +494,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Needs attention */}
-      <div>
+      <div className="hidden md:block">
         <h2 className="font-semibold text-gray-900 mb-4">Needs attention</h2>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
           <AttentionPanel title="Unassigned visits" count={d.unassignedVisits.length} emptyText="All visits have a technician." href="/visits">

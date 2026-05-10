@@ -33,12 +33,13 @@ export default async function CustomersPage() {
   const cancelled = customers.filter((c) => c.subscriptionStatus === "CANCELLED");
   const mrr = active.reduce((sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0), 0);
 
+  // First 3 shown on mobile; all 5 on desktop
   const stats = [
     { label: "Total customers", value: customers.length },
     { label: "Active", value: active.length, color: "text-green-600" },
+    { label: "MRR", value: `£${mrr}`, color: "text-emerald-600" },
     { label: "Paused", value: paused.length, color: "text-yellow-600" },
     { label: "Cancelled", value: cancelled.length, color: "text-red-500" },
-    { label: "MRR", value: `£${mrr}`, color: "text-emerald-600" },
   ];
 
   return (
@@ -47,11 +48,11 @@ export default async function CustomersPage() {
         <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
       </div>
 
-      {/* Stats bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-        {stats.map(({ label, value, color }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
-            <p className={`text-2xl font-bold ${color ?? "text-gray-900"}`}>{value}</p>
+      {/* Stats bar — 3 on mobile, all 5 on desktop */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 md:gap-4">
+        {stats.map(({ label, value, color }, i) => (
+          <div key={label} className={`bg-white rounded-2xl border border-gray-200 px-3 md:px-5 py-3 md:py-4 ${i >= 3 ? "hidden sm:block" : ""}`}>
+            <p className={`text-xl md:text-2xl font-bold ${color ?? "text-gray-900"}`}>{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}

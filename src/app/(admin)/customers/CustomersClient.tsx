@@ -57,43 +57,49 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
   return (
     <>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email or phone…"
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
+      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-3">
+        {/* Row 1: search + add */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search customers…"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-1.5 bg-brand-600 text-white text-sm font-semibold px-3 py-2 rounded-lg hover:bg-brand-700 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add</span>
+          </button>
         </div>
-        <select
-          value={tierFilter}
-          onChange={(e) => setTierFilter(e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option value="ALL">All tiers</option>
-          {["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"].map((t) => (
-            <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        >
-          <option value="ALL">All statuses</option>
-          <option value="ACTIVE">Active</option>
-          <option value="PAUSED">Paused</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
-        <button
-          onClick={() => setOpen(true)}
-          className="flex items-center gap-2 bg-brand-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-700 ml-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Add customer
-        </button>
+        {/* Row 2: filters */}
+        <div className="flex gap-2 md:contents">
+          <select
+            value={tierFilter}
+            onChange={(e) => setTierFilter(e.target.value)}
+            className="flex-1 md:flex-none text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          >
+            <option value="ALL">All tiers</option>
+            {["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"].map((t) => (
+              <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="flex-1 md:flex-none text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          >
+            <option value="ALL">All statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PAUSED">Paused</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {/* Mobile card list */}
@@ -121,12 +127,10 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
                   </span>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+              <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
                 <span>{c.properties.length} propert{c.properties.length === 1 ? "y" : "ies"}</span>
-                <span>{c.visitsPerYear} visits/yr</span>
-                <span>{c.discountPercent}% off</span>
                 <span className="ml-auto">
-                  Last: {lastVisit
+                  Last visit: {lastVisit
                     ? new Date(lastVisit.scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
                     : "none"}
                 </span>

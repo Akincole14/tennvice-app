@@ -195,59 +195,65 @@ export default function VisitsClient({
   return (
     <>
       {/* Stat tiles — clickable filters */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 md:gap-4">
         {tiles.map(({ filter, label, value, color }) => (
           <button
             key={filter}
             onClick={() => handleTileClick(filter)}
-            className={`bg-white rounded-2xl border px-5 py-4 text-left transition-all ${
+            className={`bg-white rounded-2xl border px-3 py-3 md:px-5 md:py-4 text-left transition-all ${
               isTileActive(filter)
                 ? "border-brand-400 ring-2 ring-brand-100"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+            <p className={`text-lg md:text-2xl font-bold ${color}`}>{value}</p>
+            <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 leading-tight">{label}</p>
           </button>
         ))}
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by customer or address…"
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
+      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-3">
+        {/* Row 1: search + schedule button */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search visits…"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-1.5 bg-brand-600 text-white text-sm font-semibold px-3 py-2 rounded-lg hover:bg-brand-700 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Schedule</span>
+          </button>
         </div>
-        <select value={period} onChange={e => setPeriod(e.target.value)} className={selectCls}>
-          <option value="ALL">All time</option>
-          <option value="TODAY">Today</option>
-          <option value="THIS_WEEK">This week</option>
-          <option value="NEXT_WEEK">Next week</option>
-          <option value="THIS_MONTH">This month</option>
-        </select>
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className={selectCls}>
-          <option value="ALL">All types</option>
-          {Object.entries(typeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-        </select>
-        <select value={techFilter} onChange={e => setTechFilter(e.target.value)} className={selectCls}>
-          <option value="ALL">All technicians</option>
-          <option value="UNASSIGNED">Unassigned</option>
-          {technicians.map(t => (
-            <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
-          ))}
-        </select>
-        <button
-          onClick={() => setOpen(true)}
-          className="flex items-center gap-2 bg-brand-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-700 ml-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Schedule visit
-        </button>
+        {/* Row 2: period filter (always), type + tech filters (desktop only) */}
+        <div className="flex gap-2 md:contents">
+          <select value={period} onChange={e => setPeriod(e.target.value)} className={`flex-1 md:flex-none ${selectCls}`}>
+            <option value="ALL">All time</option>
+            <option value="TODAY">Today</option>
+            <option value="THIS_WEEK">This week</option>
+            <option value="NEXT_WEEK">Next week</option>
+            <option value="THIS_MONTH">This month</option>
+          </select>
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className={`hidden md:block ${selectCls}`}>
+            <option value="ALL">All types</option>
+            {Object.entries(typeLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+          <select value={techFilter} onChange={e => setTechFilter(e.target.value)} className={`hidden md:block ${selectCls}`}>
+            <option value="ALL">All technicians</option>
+            <option value="UNASSIGNED">Unassigned</option>
+            {technicians.map(t => (
+              <option key={t.id} value={t.id}>{t.user.name ?? "Unnamed"}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Mobile card list */}
