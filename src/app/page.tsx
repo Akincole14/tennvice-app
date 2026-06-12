@@ -1,10 +1,11 @@
 import Link from "next/link";
 import {
-  Shield, Clock, Wrench, Zap, CheckCircle, ArrowRight,
-  Home, Droplets, Flame, AlertTriangle, Star, ClipboardList,
+  Shield, Clock, Zap, CheckCircle, ArrowRight,
+  Home, Star, ClipboardList,
 } from "lucide-react";
 import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
+import ChampionCarousel from "@/components/marketing/ChampionCarousel";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -61,13 +62,6 @@ const steps = [
   },
 ];
 
-const services = [
-  { icon: Droplets,      label: "Plumbing",    desc: "Pipes, pressure, water pump, cylinder, leakage checks" },
-  { icon: Zap,           label: "Electrical",  desc: "Circuit, consumer unit, socket and safety inspections" },
-  { icon: Flame,         label: "Boiler",      desc: "Annual service, efficiency check, flue and pressure test" },
-  { icon: AlertTriangle, label: "Emergency",   desc: "Same-week call-outs for urgent plumbing or electrical faults" },
-];
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const tierHighlight: Record<string, boolean> = { PREMIUM: true };
@@ -82,7 +76,7 @@ export default function HomePage() {
       <main className="min-h-screen bg-white">
 
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden tv-gradient-light pt-36 pb-24 px-6">
+        <section className="relative overflow-hidden tv-gradient-light pt-28 pb-16 sm:pt-36 sm:pb-24 px-6">
           {/* Background decoration */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-[#F5A820]/20 blur-3xl" />
@@ -96,19 +90,19 @@ export default function HomePage() {
               Trusted home maintenance subscription
             </span>
 
-            <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              Your home, always
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-5 sm:mb-6">
+              Protect Your Home &
               <br />
               <span
                 className="bg-clip-text text-transparent"
                 style={{ backgroundImage: "linear-gradient(135deg, #F5A820 0%, #E86515 50%, #C0145C 100%)" }}
               >
-                in good health.
+                Have Some Peace Of Mind!
               </span>
             </h1>
 
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Tennvice sends certified technicians for regular plumbing, electrical and boiler checks — giving your home a verifiable service record, just like a car.
+            <p className="text-base sm:text-xl text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+              We are guaranteed to provide you the best home utility maintenance service, to put yours and your family's minds at rest!<br />Certified technicians for regular plumbing, electrical and boiler checks — giving your home a verifiable service record!
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
@@ -127,39 +121,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Visual mock — service report card */}
-          <div className="relative max-w-2xl mx-auto mt-16">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Service report · May 2025</p>
-                  <p className="font-semibold text-gray-900 mt-0.5">12 Maple Close, London</p>
-                </div>
-                <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Signed</span>
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { label: "Pipes",     result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Heating",   result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Pressure",  result: "Advisory", color: "text-amber-600 bg-amber-50" },
-                  { label: "Electrical",result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Boiler",    result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Leakage",   result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Cylinder",  result: "Pass",     color: "text-green-600 bg-green-50" },
-                  { label: "Water pump",result: "Pass",     color: "text-green-600 bg-green-50" },
-                ].map(c => (
-                  <div key={c.label} className={`rounded-xl px-3 py-2.5 ${c.color.split(" ")[1]}`}>
-                    <p className="text-xs text-gray-500">{c.label}</p>
-                    <p className={`text-xs font-semibold ${c.color.split(" ")[0]}`}>{c.result}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
-                <span className="flex items-center gap-1.5"><Wrench className="w-3.5 h-3.5" /> Mike Johnson · Certified technician</span>
-                <span>Visit #14 of 24</span>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* ── Stats ── */}
@@ -178,8 +139,8 @@ export default function HomePage() {
         <section id="features" className="py-24 px-6 bg-gray-50">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900">Why homeowners choose Tennvice</h2>
-              <p className="text-lg text-gray-500 mt-4 max-w-xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Why homeowners choose Tennvice</h2>
+              <p className="text-base sm:text-lg text-gray-500 mt-4 max-w-xl mx-auto">
                 We combine qualified tradespeople with digital record-keeping so you always know your home's condition.
               </p>
             </div>
@@ -203,12 +164,12 @@ export default function HomePage() {
         <section id="how-it-works" className="py-24 px-6 bg-white">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900">How it works</h2>
-              <p className="text-lg text-gray-500 mt-4 max-w-lg mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">How it works</h2>
+              <p className="text-base sm:text-lg text-gray-500 mt-4 max-w-lg mx-auto">
                 Up and running in minutes. Your first visit booked within a week.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {steps.map((step, i) => (
                 <div key={step.number} className="relative">
                   {i < steps.length - 1 && (
@@ -227,36 +188,20 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Services ── */}
-        <section className="py-20 px-6 tv-gradient">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white">Everything your home needs</h2>
-              <p className="text-white/70 mt-3 text-base">One subscription, four service areas.</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {services.map(s => (
-                <div key={s.label} className="bg-white/15 backdrop-blur-sm rounded-2xl p-6 text-white border border-white/20">
-                  <s.icon className="w-7 h-7 mb-4 text-white/80" />
-                  <h3 className="font-semibold text-lg mb-1.5">{s.label}</h3>
-                  <p className="text-white/70 text-sm leading-relaxed">{s.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* ── Champion carousel ── */}
+        <ChampionCarousel />
 
         {/* ── Pricing ── */}
         <section id="pricing" className="py-24 px-6 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900">Simple, transparent pricing</h2>
-              <p className="text-lg text-gray-500 mt-4 max-w-xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Simple, transparent pricing</h2>
+              <p className="text-base sm:text-lg text-gray-500 mt-4 max-w-xl mx-auto">
                 No hidden call-out fees. No surprise invoices. Just one monthly subscription.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 items-start">
               {(Object.entries(SUBSCRIPTION_TIERS) as [string, typeof SUBSCRIPTION_TIERS[keyof typeof SUBSCRIPTION_TIERS]][]).map(([key, tier]) => {
                 const highlighted = tierHighlight[key];
                 return (
@@ -312,8 +257,8 @@ export default function HomePage() {
         {/* ── Social proof ── */}
         <section className="py-20 px-6 bg-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">What our customers say</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">What our customers say</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {[
                 {
                   quote: "Finally a service that treats my home like my car. I have a full history of every check and I can share it with any buyer or landlord.",
@@ -359,10 +304,10 @@ export default function HomePage() {
               <Home className="w-3.5 h-3.5" />
               Protect your home today
             </div>
-            <h2 className="text-4xl font-bold text-white mb-5">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-5">
               Ready to give your home a service record?
             </h2>
-            <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-white/60 text-base sm:text-lg mb-8 max-w-xl mx-auto">
               Join over 1,200 homeowners and landlords who trust Tennvice to keep their properties safe, compliant, and documented.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">

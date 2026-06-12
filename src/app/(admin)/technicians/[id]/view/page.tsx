@@ -1,9 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Calendar, CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle, Clock, AlertTriangle, ChevronRight } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
@@ -21,15 +19,13 @@ const statusColors: Record<string, string> = {
   CANCELLED:   "bg-red-100 text-red-700",
 };
 
-export default async function TechDashboard() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const userId = (session.user as any).id as string;
+export default async function AdminTechViewPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   const technician = await prisma.technician.findUnique({
-    where: { userId },
+    where: { id },
     include: {
+      user: { select: { name: true } },
       visits: {
         include: {
           property: {
@@ -42,16 +38,14 @@ export default async function TechDashboard() {
     },
   });
 
-  if (!technician) redirect("/login");
+  if (!technician) notFound();
 
-  const now   = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const weekEnd = new Date(today);
-  weekEnd.setDate(weekEnd.getDate() + 7);
+  const now      = new Date();
+  const today    = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+  const weekEnd  = new Date(today); weekEnd.setDate(weekEnd.getDate() + 7);
 
-  const todayVisits    = technician.visits.filter(v =>
+  const todayVisits = technician.visits.filter(v =>
     new Date(v.scheduledAt) >= today && new Date(v.scheduledAt) < tomorrow
     && v.status !== "CANCELLED"
   );
@@ -66,32 +60,51 @@ export default async function TechDashboard() {
   ).length;
   const totalAssigned  = technician.visits.filter(v => v.status !== "CANCELLED").length;
 
-  const firstName = (session.user as any).name?.split(" ")[0] ?? "there";
+  const firstName = technician.user.name?.split(" ")[0] ?? "Technician";
+
+  const h = now.getHours();
+  const greeting = h < 12 ? "morning" : h < 17 ? "afternoon" : "evening";
 
   return (
     <div className="max-w-3xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Good {greeting()}, {firstName}</h1>
-          <p className="text-gray-500 mt-1">
-            {todayVisits.length > 0
-              ? `You have ${todayVisits.length} visit${todayVisits.length > 1 ? "s" : ""} today.`
-              : "No visits scheduled for today."}
-          </p>
-        </div>
+
+      {/* Top bar */}
+      <div className="flex items-center justify-between gap-4">
+        <Link href={`/technicians/${id}`} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4" />
+          Back to profile
+        </Link>
         <SignOutButton />
+      </div>
+
+      {/* Admin badge + header */}
+      <div>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-1 rounded-full mb-3">
+          Admin view — technician dashboard
+        </span>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Good {greeting}, {firstName}</h1>
+            <p className="text-gray-500 mt-1">
+              Viewing as <span className="font-medium text-gray-700">{technician.user.name}</span>
+              {todayVisits.length > 0
+                ? ` · ${todayVisits.length} visit${todayVisits.length > 1 ? "s" : ""} today`
+                : " · No visits today"}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Active visit banner */}
       {activeVisit && (
         <Link
-          href={`/tech/visits/${activeVisit.id}`}
+          href={`/visits/${activeVisit.id}`}
           className="block bg-yellow-500 text-white rounded-2xl p-5 hover:bg-yellow-600 transition-colors"
         >
           <p className="text-yellow-100 text-xs font-semibold uppercase tracking-wide mb-1">Active visit</p>
           <p className="text-lg font-bold">{activeVisit.property.address.split(",")[0]}</p>
           <p className="text-yellow-100 text-sm mt-0.5">
-            {typeLabels[activeVisit.type] ?? activeVisit.type} · Tap to file report
+            {typeLabels[activeVisit.type] ?? activeVisit.type} · View in admin
           </p>
         </Link>
       )}
@@ -123,7 +136,7 @@ export default async function TechDashboard() {
             {todayVisits.map(v => (
               <Link
                 key={v.id}
-                href={`/tech/visits/${v.id}`}
+                href={`/visits/${v.id}`}
                 className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group"
               >
                 <div className="min-w-0">
@@ -159,7 +172,7 @@ export default async function TechDashboard() {
             {upcomingVisits.map(v => (
               <Link
                 key={v.id}
-                href={`/tech/visits/${v.id}`}
+                href={`/visits/${v.id}`}
                 className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group"
               >
                 <div className="min-w-0">
@@ -183,16 +196,9 @@ export default async function TechDashboard() {
         <div className="bg-white rounded-2xl border border-gray-200 px-6 py-12 text-center">
           <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
           <p className="text-sm font-medium text-gray-600">No visits scheduled this week</p>
-          <p className="text-xs text-gray-400 mt-1">Check back later or contact your coordinator.</p>
         </div>
       )}
+
     </div>
   );
-}
-
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "morning";
-  if (h < 17) return "afternoon";
-  return "evening";
 }

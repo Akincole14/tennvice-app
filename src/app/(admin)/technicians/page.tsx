@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import TechniciansClient from "./TechniciansClient";
+import SignOutButton from "@/components/SignOutButton";
 
 async function getData() {
   const technicians = await prisma.technician.findMany({
@@ -37,24 +38,25 @@ export default async function TechniciansPage() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Technicians</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Technicians</h1>
           <p className="text-gray-500 mt-1">Manage your field team</p>
         </div>
+        <SignOutButton />
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: "Total technicians", value: technicians.length,  color: "text-gray-900" },
-          { label: "Completed visits",  value: totalCompleted,       color: "text-green-600" },
-          { label: "Upcoming visits",   value: totalUpcoming,        color: "text-blue-600" },
-          { label: "Unassigned visits", value: unassigned,           color: unassigned > 0 ? "text-amber-600" : "text-gray-900" },
+          { label: "Total technicians", value: technicians.length, color: "text-gray-900" },
+          { label: "Completed visits",  value: totalCompleted,      color: "text-green-600" },
+          { label: "Upcoming visits",   value: totalUpcoming,       color: "text-blue-600" },
+          { label: "Unassigned visits", value: unassigned,          color: unassigned > 0 ? "text-amber-600" : "text-gray-900" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-200 px-5 py-4 text-center">
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
+          <div key={label} className="bg-white rounded-2xl border border-gray-200 px-3 md:px-5 py-3 md:py-4 text-center">
+            <p className={`text-xl md:text-2xl font-bold ${color}`}>{value}</p>
             <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
         ))}

@@ -48,7 +48,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex">
 
       {/* ── Left brand panel ── */}
-      <div className="hidden lg:flex lg:w-1/2 tv-gradient flex-col justify-between p-12 relative overflow-hidden">
+      <div className="hidden md:flex md:w-5/12 lg:w-1/2 tv-gradient flex-col justify-between p-10 lg:p-12 relative overflow-hidden">
         {/* Background decoration */}
         <div aria-hidden className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-2xl" />
@@ -59,7 +59,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="relative">
           <Link href="/" className="inline-flex items-center gap-2 text-white">
-            <span className="text-2xl font-bold">Tennvice</span>
+            <span className="text-4xl font-bold">Tennvice</span>
           </Link>
         </div>
 
@@ -95,10 +95,10 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right form panel ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white">
+      <div className="flex-1 flex flex-col bg-white px-6">
 
-        {/* Back to home — mobile only shows logo too */}
-        <div className="w-full max-w-sm mb-8">
+        {/* Back to home — pinned to top */}
+        <div className="w-full max-w-sm mx-auto py-4 lg:py-6">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
@@ -106,16 +106,19 @@ export default function LoginPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to home
           </Link>
+        </div>
 
-          {/* Logo on mobile (hidden on desktop where left panel shows it) */}
-          <div className="mt-6 lg:hidden">
-            <span className="text-2xl font-bold text-brand-700">Tennvice</span>
-          </div>
+        {/* Centred form area */}
+        <div className="flex-1 flex flex-col items-center justify-center py-8">
+
+        {/* Logo on mobile (hidden on desktop where left panel shows it) */}
+        <div className="w-full max-w-sm mb-6 text-center md:hidden">
+          <span className="text-4xl font-bold text-brand-700">Tennvice</span>
         </div>
 
         {/* Form card */}
         <div className="w-full max-w-sm">
-          <div className="mb-8">
+          <div className="mb-8 text-center md:text-left">
             <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
             <p className="text-gray-500 mt-1 text-sm">Sign in to your account to continue</p>
           </div>
@@ -172,6 +175,16 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Forgot password */}
+            <div className="flex justify-center -mt-2">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-brand-600 hover:text-brand-800 font-medium transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
@@ -199,6 +212,7 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
+        </div>
         </div>
       </div>
     </div>

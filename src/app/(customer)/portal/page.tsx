@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText } from "lucide-react";
+import SignOutButton from "@/components/SignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -89,10 +90,13 @@ export default async function CustomerPortalPage() {
   };
 
   return (
-    <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Home</h1>
-        <p className="text-gray-500 mt-1">Welcome back, {customer.user.name?.split(" ")[0] ?? "there"}</p>
+    <div className="max-w-3xl mx-auto space-y-5 md:space-y-8 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Home</h1>
+          <p className="text-gray-500 mt-1">Welcome back, {customer.user.name?.split(" ")[0] ?? "there"}</p>
+        </div>
+        <SignOutButton />
       </div>
 
       {/* Next visit banner */}
@@ -118,17 +122,17 @@ export default async function CustomerPortalPage() {
       )}
 
       {/* Quick stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {[
           { icon: CheckCircle, label: "Completed visits", value: completedVisits, color: "text-green-600 bg-green-50" },
           { icon: Clock,       label: "Upcoming visits",  value: upcomingVisits,  color: "text-blue-600 bg-blue-50" },
           { icon: Home,        label: "Properties",       value: customer.properties.length, color: "text-purple-600 bg-purple-50" },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center gap-3">
-            <div className={`p-2.5 rounded-xl ${color}`}><Icon className="w-4 h-4" /></div>
+          <div key={label} className="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5 flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 text-center sm:text-left">
+            <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${color}`}><Icon className="w-4 h-4" /></div>
             <div>
-              <p className="text-xl font-bold text-gray-900">{value}</p>
-              <p className="text-xs text-gray-500">{label}</p>
+              <p className="text-lg sm:text-xl font-bold text-gray-900">{value}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 leading-tight">{label}</p>
             </div>
           </div>
         ))}
@@ -146,7 +150,7 @@ export default async function CustomerPortalPage() {
             {customer.subscriptionStatus.charAt(0) + customer.subscriptionStatus.slice(1).toLowerCase()}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-4">
           <div className="flex justify-between">
             <span className="text-gray-500">Visits per year</span>
             <span className="font-medium text-gray-900">{customer.visitsPerYear}</span>
@@ -215,7 +219,7 @@ export default async function CustomerPortalPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-6 mt-4 text-sm">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4 text-sm">
               <div>
                 <p className="text-xs text-gray-400">Health</p>
                 <p className={`font-medium ${health.color}`}>{health.label}</p>

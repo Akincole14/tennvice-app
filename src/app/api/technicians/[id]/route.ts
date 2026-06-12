@@ -11,7 +11,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const { id } = await params;
-  const { name, email, phone, qualification, licenceNumber, newPassword } = await req.json();
+  const {
+    name, email, phone, qualification, licenceNumber, newPassword,
+    address, nokName, nokPhone, nokRelationship,
+  } = await req.json();
 
   if (!name?.trim() || !email?.trim()) {
     return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
@@ -43,8 +46,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     prisma.technician.update({
       where: { id },
       data: {
-        qualification: qualification?.trim() || null,
-        licenceNumber: licenceNumber?.trim() || null,
+        qualification:   qualification?.trim()   || null,
+        licenceNumber:   licenceNumber?.trim()   || null,
+        address:         address?.trim()         || null,
+        nokName:         nokName?.trim()         || null,
+        nokPhone:        nokPhone?.trim()        || null,
+        nokRelationship: nokRelationship?.trim() || null,
       },
     }),
   ]);

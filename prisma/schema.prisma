@@ -112,15 +112,19 @@ model Property {
 // ─── Technicians ──────────────────────────────────────────────────────────────
 
 model Technician {
-  id            String                   @id @default(cuid())
-  userId        String                   @unique
-  user          User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  qualification String?
-  licenceNumber String?
-  createdAt     DateTime                 @default(now())
-  updatedAt     DateTime                 @updatedAt
-  visits        Visit[]
-  certificates  TechnicianCertificate[]
+  id              String                   @id @default(cuid())
+  userId          String                   @unique
+  user            User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qualification   String?
+  licenceNumber   String?
+  address         String?
+  nokName         String?
+  nokPhone        String?
+  nokRelationship String?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  visits          Visit[]
+  certificates    TechnicianCertificate[]
 }
 
 model TechnicianCertificate {

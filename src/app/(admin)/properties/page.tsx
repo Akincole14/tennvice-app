@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import PropertiesClient from "./PropertiesClient";
+import SignOutButton from "@/components/SignOutButton";
 
 async function getProperties() {
   return prisma.property.findMany({
@@ -36,8 +37,11 @@ export default async function PropertiesPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
+    <div className="max-w-6xl mx-auto space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
+        <SignOutButton />
+      </div>
 
       {/* Stats bar */}
       <div className="grid grid-cols-3 gap-4">

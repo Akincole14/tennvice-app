@@ -319,7 +319,8 @@ export default function VisitsClient({
 
       {/* Desktop table */}
       <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-5 py-3 font-medium text-gray-500">Date & time</th>
@@ -397,6 +398,7 @@ export default function VisitsClient({
             )}
           </tbody>
         </table>
+        </div>
         <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400">
           Showing {filtered.length} of {visits.length} visits
         </div>

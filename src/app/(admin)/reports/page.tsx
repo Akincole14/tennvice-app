@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ReportsClient from "./ReportsClient";
+import SignOutButton from "@/components/SignOutButton";
 
 export default async function ReportsPage() {
   const [visits, technicians] = await Promise.all([
@@ -26,8 +27,11 @@ export default async function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Reports</h1>
+        <SignOutButton />
+      </div>
       <ReportsClient visits={visits} technicians={technicians} stats={stats} />
     </div>
   );

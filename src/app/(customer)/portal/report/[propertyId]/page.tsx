@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import PrintButton from "./PrintButton";
+import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine Plumbing Inspection",
@@ -75,14 +76,17 @@ export default async function ServiceReportPage({ params }: { params: Promise<{ 
   const backHref = isAdmin ? `/properties` : `/portal`;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 py-4 md:py-8">
       {/* Screen-only controls */}
       <div className="flex items-center justify-between print:hidden">
         <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
-        <PrintButton />
+        <div className="flex items-center gap-3">
+          <SignOutButton />
+          <PrintButton />
+        </div>
       </div>
 
       {/* ── Report document ── */}

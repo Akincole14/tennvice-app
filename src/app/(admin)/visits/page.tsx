@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import VisitsClient from "./VisitsClient";
+import SignOutButton from "@/components/SignOutButton";
 
 async function getData() {
   const [visits, properties, technicians] = await Promise.all([
@@ -29,8 +30,11 @@ export default async function VisitsPage() {
   const { visits, properties, technicians } = await getData();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Visits</h1>
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Visits</h1>
+        <SignOutButton />
+      </div>
       <VisitsClient visits={visits} properties={properties} technicians={technicians} />
     </div>
   );

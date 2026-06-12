@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LayoutDashboard } from "lucide-react";
 import TechnicianProfile from "./TechnicianProfile";
 import AdminCertificates from "./AdminCertificates";
+import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine Plumbing",
@@ -47,11 +48,23 @@ export default async function TechnicianDetailPage({ params }: { params: Promise
   const cancelled  = technician.visits.filter(v => v.status === "CANCELLED");
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <Link href="/technicians" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="w-4 h-4" />
-        Back to technicians
-      </Link>
+    <div className="max-w-3xl mx-auto space-y-6 py-4 md:py-8">
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/technicians" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4" />
+          Back to technicians
+        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/technicians/${id}/view`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-xl transition-colors"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            View dashboard
+          </Link>
+          <SignOutButton />
+        </div>
+      </div>
 
       {/* Profile card with edit */}
       <TechnicianProfile technician={technician} />

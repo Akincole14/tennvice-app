@@ -412,17 +412,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen tv-gradient-light flex items-center justify-center p-4">
+    <div className="min-h-screen tv-gradient-light flex flex-col p-4">
+      {/* Back to home — pinned to top */}
+      <div className="w-full max-w-lg mx-auto py-3">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-700 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to home
+        </Link>
+      </div>
+
+      {/* Centred content */}
+      <div className="flex-1 flex items-center justify-center">
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold text-brand-700 inline-block mb-2">Tennvice</Link>
-          <div className="flex justify-center mb-3">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-700 transition-colors">
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back to home
-            </Link>
-          </div>
           <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
           <p className="text-gray-500 mt-1 text-sm">Set up your home maintenance subscription in minutes</p>
         </div>
@@ -496,6 +503,7 @@ export default function RegisterPage() {
           and{" "}
           <Link href="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>.
         </p>
+      </div>
       </div>
     </div>
   );

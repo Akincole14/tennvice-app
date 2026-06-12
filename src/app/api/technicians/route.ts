@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
   }
 
-  const { name, email, phone, password, qualification, licenceNumber } = await req.json();
+  const {
+    name, email, phone, password, qualification, licenceNumber,
+    address, nokName, nokPhone, nokRelationship,
+  } = await req.json();
 
   if (!name?.trim() || !email?.trim() || !password?.trim()) {
     return NextResponse.json({ error: "Name, email and password are required" }, { status: 400 });
@@ -32,8 +35,12 @@ export async function POST(req: NextRequest) {
       role: "TECHNICIAN",
       technician: {
         create: {
-          qualification: qualification?.trim() || null,
-          licenceNumber: licenceNumber?.trim() || null,
+          qualification:   qualification?.trim()   || null,
+          licenceNumber:   licenceNumber?.trim()   || null,
+          address:         address?.trim()         || null,
+          nokName:         nokName?.trim()         || null,
+          nokPhone:        nokPhone?.trim()        || null,
+          nokRelationship: nokRelationship?.trim() || null,
         },
       },
     },

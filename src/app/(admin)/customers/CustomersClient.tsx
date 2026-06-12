@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
+import Link from "next/link";
 import AddCustomerModal from "@/components/admin/AddCustomerModal";
 
 const tierColors: Record<string, string> = {
@@ -111,10 +112,10 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
             .flatMap((p) => p.visits)
             .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0];
           return (
-            <div key={c.id} className="px-4 py-4">
+            <Link key={c.id} href={`/customers/${c.id}`} className="block px-4 py-4 hover:bg-gray-50 transition-colors">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">{c.user.name ?? "—"}</p>
+                  <p className="font-semibold text-brand-600 truncate">{c.user.name ?? "—"}</p>
                   <p className="text-sm text-gray-500 truncate">{c.user.email}</p>
                   {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
                 </div>
@@ -135,7 +136,7 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
                     : "none"}
                 </span>
               </div>
-            </div>
+            </Link>
           );
         })}
         <div className="px-4 py-3 text-xs text-gray-400">
@@ -145,7 +146,8 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
 
       {/* Desktop table */}
       <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-5 py-3 font-medium text-gray-500">Name</th>
@@ -173,7 +175,11 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
                   .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0];
                 return (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3 font-medium text-gray-900">{c.user.name ?? "—"}</td>
+                    <td className="px-5 py-3 font-medium">
+                      <Link href={`/customers/${c.id}`} className="text-brand-600 hover:underline">
+                        {c.user.name ?? "—"}
+                      </Link>
+                    </td>
                     <td className="px-5 py-3">
                       <p className="text-gray-700">{c.user.email}</p>
                       {c.user.phone && <p className="text-gray-400 text-xs">{c.user.phone}</p>}
@@ -205,6 +211,7 @@ export default function CustomersClient({ customers }: { customers: Customer[] }
             )}
           </tbody>
         </table>
+        </div>
         <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400">
           Showing {filtered.length} of {customers.length} customers
         </div>

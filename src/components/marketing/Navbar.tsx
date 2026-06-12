@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Shield, Info, PoundSterling } from "lucide-react";
+import { Menu, X, Shield, Info, PoundSterling, Wrench } from "lucide-react";
 
 const links = [
   { href: "#features",     label: "Features",     icon: Shield },
+  { href: "#services",     label: "Services",     icon: Wrench },
   { href: "#how-it-works", label: "How it works",  icon: Info },
   { href: "#pricing",      label: "Pricing",       icon: PoundSterling },
 ];
@@ -29,7 +30,9 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-200 ${
-          scrolled || open ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+          scrolled || open
+            ? "bg-white/95 backdrop-blur-md shadow-sm"
+            : "bg-white md:bg-transparent"
         }`}
       >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">

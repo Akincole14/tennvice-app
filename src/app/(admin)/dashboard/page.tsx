@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SignOutButton from "@/components/SignOutButton";
 import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar, AlertCircle, PoundSterling,
@@ -206,22 +207,25 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8 py-4 md:py-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
         </div>
-        {d.newCustomersThisMonth > 0 && (
-          <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
-            <TrendingUp className="w-4 h-4" />
-            <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
-            {customerGrowth !== null && (
-              <span className="text-xs text-green-500">({customerGrowth >= 0 ? "+" : ""}{customerGrowth}% vs last month)</span>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {d.newCustomersThisMonth > 0 && (
+            <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
+              <TrendingUp className="w-4 h-4" />
+              <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
+              {customerGrowth !== null && (
+                <span className="text-xs text-green-500">({customerGrowth >= 0 ? "+" : ""}{customerGrowth}% vs last month)</span>
+              )}
+            </div>
+          )}
+          <SignOutButton />
+        </div>
       </div>
 
       {/* Stat cards — first 4 on mobile, all 8 on desktop */}
@@ -280,11 +284,11 @@ export default async function DashboardPage() {
                     {v.technician ? v.technician.user.name : <span className="text-orange-500 font-medium">Unassigned</span>}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${v.isEmergency ? "bg-red-100 text-red-700" : (typeColors[v.type] ?? "bg-gray-100 text-gray-600")}`}>
+                <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${v.isEmergency ? "bg-red-100 text-red-700" : (typeColors[v.type] ?? "bg-gray-100 text-gray-600")}`}>
                     {v.isEmergency ? "Emergency" : (typeLabels[v.type] ?? v.type)}
                   </span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
+                  <span className={`hidden sm:inline text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${statusColors[v.status]}`}>
                     {v.status.replace("_", " ")}
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500" />
@@ -317,7 +321,8 @@ export default async function DashboardPage() {
             <h2 className="font-semibold text-gray-900">Upcoming visits</h2>
             <Link href="/visits" className="text-xs text-brand-600 hover:underline font-medium">View all</Link>
           </div>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[420px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
                 {["Date", "Customer", "Type", "Technician"].map(h => (
@@ -358,6 +363,7 @@ export default async function DashboardPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Tier breakdown */}

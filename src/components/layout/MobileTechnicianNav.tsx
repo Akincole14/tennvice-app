@@ -32,7 +32,7 @@ export default function MobileTechnicianNav({
       {/* ── Top header ── */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
         <div>
-          <span className="text-xl font-bold text-brand-700">Tennvice</span>
+          <span className="text-3xl font-bold text-brand-700">Tennvice</span>
           <span className="ml-2 text-xs text-gray-400">Technician</span>
         </div>
         <button
@@ -51,7 +51,7 @@ export default function MobileTechnicianNav({
       </header>
 
       {/* ── Nav row ── */}
-      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex overflow-x-auto h-12">
+      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex justify-center overflow-x-auto h-12">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (

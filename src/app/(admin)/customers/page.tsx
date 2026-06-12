@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 import CustomersClient from "./CustomersClient";
+import SignOutButton from "@/components/SignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -43,9 +44,10 @@ export default async function CustomersPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Customers</h1>
+        <SignOutButton />
       </div>
 
       {/* Stats bar — 3 on mobile, all 5 on desktop */}

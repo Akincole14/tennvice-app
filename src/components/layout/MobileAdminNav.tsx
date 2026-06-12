@@ -35,7 +35,7 @@ export default function MobileAdminNav({ name, photo }: { name: string; photo?: 
     <>
       {/* ── Top header ── */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
-        <span className="text-xl font-bold text-brand-700">Tennvice</span>
+        <span className="text-3xl font-bold text-brand-700">Tennvice</span>
         <button
           onClick={() => setOpen(true)}
           className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-brand-100"
@@ -52,7 +52,7 @@ export default function MobileAdminNav({ name, photo }: { name: string; photo?: 
       </header>
 
       {/* ── Nav row (h-12 = 48px, so total fixed height = 56+48 = 104px) ── */}
-      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex overflow-x-auto h-12">
+      <nav className="md:hidden fixed top-14 inset-x-0 z-40 bg-white border-b border-gray-200 flex justify-center overflow-x-auto h-12">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (

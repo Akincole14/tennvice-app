@@ -25,6 +25,13 @@
   .tv-gradient-dark {
     background: linear-gradient(135deg, #1e2a5e 0%, #0e3a4a 30%, #4a1a08 65%, #3a0420 100%);
   }
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out both;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0);   }
+  }
 }
 
 @media print {

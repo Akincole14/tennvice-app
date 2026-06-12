@@ -1,7 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -52,11 +49,7 @@ function StatusStepper({ status }: { status: string }) {
       </div>
     );
   }
-
-  const activeIndex =
-    status === "SCHEDULED"   ? 0 :
-    status === "IN_PROGRESS" ? 1 : 2;
-
+  const activeIndex = status === "SCHEDULED" ? 0 : status === "IN_PROGRESS" ? 1 : 2;
   return (
     <div className="bg-white rounded-2xl border border-gray-200 px-5 py-4">
       <div className="flex items-center">
@@ -73,9 +66,7 @@ function StatusStepper({ status }: { status: string }) {
                 >
                   {done ? "✓" : i + 1}
                 </div>
-                <span className={`text-xs font-medium whitespace-nowrap
-                  ${done || current ? "text-gray-700" : "text-gray-300"}`}
-                >
+                <span className={`text-xs font-medium whitespace-nowrap ${done || current ? "text-gray-700" : "text-gray-300"}`}>
                   {step}
                 </span>
               </div>
@@ -90,17 +81,14 @@ function StatusStepper({ status }: { status: string }) {
   );
 }
 
-export default async function CustomerVisitDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
+export default async function AdminVisitCustomerViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const visit = await prisma.visit.findUnique({
     where: { id },
     include: {
       property: {
-        include: { customer: { include: { user: { select: { id: true } } } } },
+        include: { customer: { include: { user: { select: { name: true, id: true } } } } },
       },
       technician: { include: { user: { select: { name: true, phone: true } } } },
       report: true,
@@ -108,9 +96,6 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
   });
 
   if (!visit) notFound();
-
-  const userId = (session.user as any).id;
-  if (visit.property.customer.user.id !== userId) notFound();
 
   const { report, property } = visit;
 
@@ -128,18 +113,31 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
     : [];
 
   const hasServices = report && (
-    report.boilerServiced || report.systemFlushed ||
-    report.cylinderFlushed || report.usageAdviceGiven
+    report.boilerServiced || report.systemFlushed || report.cylinderFlushed || report.usageAdviceGiven
   );
+
+  const customerId = property.customer?.id;
 
   return (
     <div className="max-w-2xl mx-auto space-y-5 py-4 md:py-8">
+
+      {/* Top bar */}
       <div className="flex items-center justify-between gap-4">
-        <Link href="/portal/visits" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+        <Link href={`/visits/${id}`} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
           <ArrowLeft className="w-4 h-4" />
-          Back to visit history
+          Back to visit
         </Link>
         <SignOutButton />
+      </div>
+
+      {/* Admin badge */}
+      <div>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-1 rounded-full mb-3">
+          Admin view — customer portal
+        </span>
+        <p className="text-sm text-gray-500">
+          Viewing as <span className="font-medium text-gray-700">{property.customer.user.name}</span>
+        </p>
       </div>
 
       {/* Header */}
@@ -192,12 +190,11 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
               {(property as any).bedrooms ? ` · ${(property as any).bedrooms} bed` : ""}
             </p>
           )}
-          <Link
-            href={`/portal/properties/${property.id}`}
-            className="mt-3 inline-block text-xs text-brand-600 font-medium hover:underline"
-          >
-            View property →
-          </Link>
+          {customerId && (
+            <Link href={`/customers/${customerId}`} className="mt-3 inline-block text-xs text-brand-600 font-medium hover:underline">
+              View customer →
+            </Link>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-5">
@@ -217,12 +214,12 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500 leading-snug">Your technician will be confirmed closer to the visit date.</p>
+            <p className="text-sm text-gray-500">Your technician will be confirmed closer to the visit date.</p>
           )}
         </div>
       </div>
 
-      {/* Upcoming visit — what to expect */}
+      {/* Upcoming — what to expect */}
       {visit.status === "SCHEDULED" && (
         <div className="bg-brand-50 border border-brand-100 rounded-2xl p-5">
           <p className="text-sm font-semibold text-brand-800 mb-2">What to expect</p>
@@ -245,7 +242,6 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
       {/* Signed report */}
       {report?.signedByTechnician && (
         <div className="space-y-4">
-          {/* Report header bar */}
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-900">Inspection report</p>
             <div className="flex items-center gap-3">
@@ -264,7 +260,6 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
             </div>
           </div>
 
-          {/* Check results */}
           {checks.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-200 p-5">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Inspection results</p>
@@ -290,7 +285,6 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
             </div>
           )}
 
-          {/* Services performed */}
           {hasServices && (
             <div className="bg-white rounded-2xl border border-gray-200 p-5">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Services performed</p>
@@ -303,7 +297,6 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
             </div>
           )}
 
-          {/* Notes */}
           {(report.overallNotes || report.recommendations || report.partsRequired || report.followUpRequired) && (
             <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Notes & recommendations</p>
@@ -328,7 +321,7 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
               {report.followUpRequired && (
                 <div className="flex items-start gap-2.5 bg-amber-50 rounded-xl px-4 py-3 text-amber-700">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p className="text-sm font-medium">A follow-up visit has been recommended. We'll be in touch to arrange this.</p>
+                  <p className="text-sm font-medium">A follow-up visit has been recommended.</p>
                 </div>
               )}
             </div>
@@ -336,21 +329,19 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
         </div>
       )}
 
-      {/* Completed but report not yet signed */}
       {visit.status === "COMPLETED" && report && !report.signedByTechnician && (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
           <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm font-medium text-gray-600">Your report is being finalised</p>
-          <p className="text-xs text-gray-400 mt-1">It will appear here once your technician has signed it off.</p>
+          <p className="text-sm font-medium text-gray-600">Report is being finalised</p>
+          <p className="text-xs text-gray-400 mt-1">Will appear here once the technician has signed it off.</p>
         </div>
       )}
 
-      {/* No report at all yet */}
       {visit.status === "COMPLETED" && !report && (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
           <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
           <p className="text-sm font-medium text-gray-600">Report pending</p>
-          <p className="text-xs text-gray-400 mt-1">Your technician will file the report shortly after the visit.</p>
+          <p className="text-xs text-gray-400 mt-1">The technician will file the report shortly after the visit.</p>
         </div>
       )}
     </div>

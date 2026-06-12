@@ -7,6 +7,7 @@ import {
   ArrowLeft, Home, CheckCircle, AlertTriangle,
   XCircle, MinusCircle, FileText, Calendar,
 } from "lucide-react";
+import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine Plumbing",
@@ -92,11 +93,14 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
   const hasFollowUp = property.visits.some(v => v.report?.followUpRequired && !v.report.signedByTechnician);
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <Link href="/portal" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="w-4 h-4" />
-        Back to My Home
-      </Link>
+    <div className="max-w-2xl mx-auto space-y-6 py-4 md:py-8">
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/portal" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4" />
+          Back to My Home
+        </Link>
+        <SignOutButton />
+      </div>
 
       {/* Property header */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6">

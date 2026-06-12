@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Home, User, Wrench, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Home, User, Wrench, AlertTriangle, Eye } from "lucide-react";
 import VisitStatusControls from "./VisitStatusControls";
 import VisitActions from "./VisitActions";
+import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine — Plumbing",
@@ -76,12 +77,31 @@ export default async function VisitDetailPage({ params }: { params: Promise<{ id
     : [];
 
   return (
-    <div className="max-w-4xl space-y-6">
-      {/* Back */}
-      <Link href="/visits" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
-        <ArrowLeft className="w-4 h-4" />
-        Back to visits
-      </Link>
+    <div className="max-w-4xl mx-auto space-y-6 py-4 md:py-8">
+      {/* Top bar */}
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/visits" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4" />
+          Back to visits
+        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/visits/${id}/customer-view`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-xl transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Customer view
+          </Link>
+          <Link
+            href={`/visits/${id}/tech-view`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 border border-brand-200 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-xl transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Technician view
+          </Link>
+          <SignOutButton />
+        </div>
+      </div>
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">

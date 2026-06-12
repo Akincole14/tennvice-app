@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AccountClient from "@/app/(customer)/portal/account/AccountClient";
 import PhotoUpload from "./PhotoUpload";
+import SignOutButton from "@/components/SignOutButton";
 
 export default async function TechAccountPage() {
   const session = await getServerSession(authOptions);
@@ -25,10 +26,13 @@ export default async function TechAccountPage() {
   if (!user || !technician) redirect("/login");
 
   return (
-    <div className="max-w-xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
-        <p className="text-gray-500 mt-1">Update your profile photo, personal details and password</p>
+    <div className="max-w-xl mx-auto space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
+          <p className="text-gray-500 mt-1">Update your profile photo, personal details and password</p>
+        </div>
+        <SignOutButton />
       </div>
 
       <PhotoUpload

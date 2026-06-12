@@ -4,9 +4,9 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-400">
       <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="col-span-2 md:col-span-2">
             <span className="text-2xl font-bold text-white">Tennvice</span>
             <p className="mt-3 text-sm leading-relaxed max-w-xs">
               Subscription-based home maintenance giving every home a full service history — just like your car.

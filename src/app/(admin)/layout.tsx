@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileAdminNav from "@/components/layout/MobileAdminNav";
 
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   const user    = session?.user as any;

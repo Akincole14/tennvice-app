@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import AccountClient from "./AccountClient";
 import CustomerPhotoUpload from "./CustomerPhotoUpload";
+import SignOutButton from "@/components/SignOutButton";
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
@@ -19,10 +20,13 @@ export default async function AccountPage() {
   if (!user) redirect("/login");
 
   return (
-    <div className="max-w-xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
-        <p className="text-gray-500 mt-1">Manage your personal details and password</p>
+    <div className="max-w-xl mx-auto space-y-6 py-4 md:py-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Account settings</h1>
+          <p className="text-gray-500 mt-1">Manage your personal details and password</p>
+        </div>
+        <SignOutButton />
       </div>
       <CustomerPhotoUpload name={user.name ?? ""} currentPhoto={user.image ?? null} />
       <AccountClient user={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone }} />
