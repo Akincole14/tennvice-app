@@ -83,6 +83,9 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
   const tier  = SUBSCRIPTION_TIERS[customer.subscriptionTier as keyof typeof SUBSCRIPTION_TIERS];
   const price = TIER_PRICES[customer.subscriptionTier] ?? tier?.price;
   const now   = new Date();
+  const monthsSubscribed = (now.getTime() - new Date(customer.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+  const discountActive   = monthsSubscribed <= 6;
+  const effectiveDiscount = discountActive ? Math.min(customer.discountPercent, 20) : 0;
 
   const allVisits = customer.properties.flatMap((p) =>
     p.visits.map((v) => ({ ...v, propertyAddress: p.address }))
@@ -182,7 +185,11 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Discount</span>
-            <span className="font-medium text-gray-900">{customer.discountPercent}% off parts & labour</span>
+            <span className="font-medium text-gray-900">
+              {discountActive
+                ? `${effectiveDiscount}% off parts & labour`
+                : <span className="text-gray-400">0% — introductory period ended</span>}
+            </span>
           </div>
           {customer.emergencyCallouts > 0 && (
             <div className="flex justify-between col-span-2">

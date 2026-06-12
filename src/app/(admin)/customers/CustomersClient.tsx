@@ -23,6 +23,11 @@ const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
 };
 
+function effectiveDiscount(percent: number, subscribedAt: Date): number {
+  const months = (Date.now() - new Date(subscribedAt).getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+  return months <= 6 ? Math.min(percent, 20) : 0;
+}
+
 type Customer = {
   id: string;
   subscriptionTier: string;
@@ -194,7 +199,14 @@ export default function CustomersClient({ customers, isSenior }: { customers: Cu
                         {c.subscriptionStatus.charAt(0) + c.subscriptionStatus.slice(1).toLowerCase()}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-gray-600">{c.discountPercent}%</td>
+                    <td className="px-5 py-3 text-gray-600">
+                      {(() => {
+                        const eff = effectiveDiscount(c.discountPercent, c.createdAt);
+                        return eff > 0
+                          ? <span>{eff}%</span>
+                          : <span className="text-gray-400">0% <span className="text-xs">(expired)</span></span>;
+                      })()}
+                    </td>
                     <td className="px-5 py-3 text-gray-600">{c.visitsPerYear}</td>
                     <td className="px-5 py-3 text-gray-600">{c.properties.length}</td>
                     <td className="px-5 py-3 text-gray-500 text-xs">

@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
   }
 
   const tierDefaults: Record<string, { visitsPerYear: number; emergencyCallouts: number; discountPercent: number }> = {
-    BASIC:    { visitsPerYear: 2, emergencyCallouts: 0, discountPercent: 20 },
-    STANDARD: { visitsPerYear: 2, emergencyCallouts: 0, discountPercent: 20 },
-    PLUS:     { visitsPerYear: 4, emergencyCallouts: 0, discountPercent: 30 },
-    PREMIUM:    { visitsPerYear: 4,  emergencyCallouts: 2,         discountPercent: 40 },
-    ENTERPRISE: { visitsPerYear: 12, emergencyCallouts: Infinity,  discountPercent: 50 },
+    BASIC:      { visitsPerYear: 2,  emergencyCallouts: 0,        discountPercent: 20 },
+    STANDARD:   { visitsPerYear: 2,  emergencyCallouts: 0,        discountPercent: 20 },
+    PLUS:       { visitsPerYear: 4,  emergencyCallouts: 0,        discountPercent: 20 },
+    PREMIUM:    { visitsPerYear: 4,  emergencyCallouts: 2,        discountPercent: 20 },
+    ENTERPRISE: { visitsPerYear: 12, emergencyCallouts: Infinity, discountPercent: 20 },
   };
 
   const defaults = tierDefaults[subscriptionTier];
