@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -71,6 +73,10 @@ async function getCustomer(id: string) {
 
 export default async function AdminCustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session   = await getServerSession(authOptions);
+  const adminRole = (session?.user as any)?.adminRole ?? null;
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+
   const customer = await getCustomer(id);
   if (!customer) notFound();
 

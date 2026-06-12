@@ -37,7 +37,7 @@ type Customer = {
   }[];
 };
 
-export default function CustomersClient({ customers }: { customers: Customer[] }) {
+export default function CustomersClient({ customers, isSenior }: { customers: Customer[]; isSenior: boolean }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState("ALL");
