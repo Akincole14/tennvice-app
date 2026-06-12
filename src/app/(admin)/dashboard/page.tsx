@@ -392,7 +392,7 @@ export default async function DashboardPage() {
                       <span className="text-sm text-gray-700 font-medium">
                         {tier.charAt(0) + tier.slice(1).toLowerCase()}
                       </span>
-                      <span className="text-sm text-gray-500">{count} · £{TIER_PRICES[tier]}/mo</span>
+                      <span className="text-sm text-gray-500">{count}{isSenior ? ` · £${TIER_PRICES[tier]}/mo` : ""}</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div className={`h-full rounded-full ${tierBarColors[tier]}`} style={{ width: `${(count / maxTierCount) * 100}%` }} />
@@ -402,18 +402,24 @@ export default async function DashboardPage() {
                 );
               })}
               <div className="pt-3 border-t border-gray-100 space-y-1.5 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">MRR</span>
-                  <span className="font-bold text-emerald-600">£{d.mrr.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">ARR</span>
-                  <span className="font-bold text-emerald-600">£{d.arr.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Avg per customer</span>
-                  <span className="font-semibold text-gray-700">£{d.avgRevenue}/mo</span>
-                </div>
+                {isSenior && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">MRR</span>
+                      <span className="font-bold text-emerald-600">£{d.mrr.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">ARR</span>
+                      <span className="font-bold text-emerald-600">£{d.arr.toLocaleString()}</span>
+                    </div>
+                  </>
+                )}
+                {isSenior && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Avg per customer</span>
+                    <span className="font-semibold text-gray-700">£{d.avgRevenue}/mo</span>
+                  </div>
+                )}
               </div>
             </div>
           )}

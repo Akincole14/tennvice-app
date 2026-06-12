@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Plus, X, Loader2, AlertCircle, CheckCircle, ShieldCheck, Shield, Camera, Upload, VideoIcon } from "lucide-react";
+import { Plus, X, Loader2, AlertCircle, CheckCircle, ShieldCheck, Shield, Camera, Upload, VideoIcon, Eye, EyeOff } from "lucide-react";
 
 type AdminUser = {
   id: string;
@@ -18,6 +18,7 @@ function SetUpAdminModal({ onClose, onCreated }: { onClose: () => void; onCreate
   const [cameraOpen,   setCameraOpen]   = useState(false);
   const [cameraError,  setCameraError]  = useState<string | null>(null);
   const [lightingWarn, setLightingWarn] = useState<"dark" | "bright" | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
 
@@ -225,9 +226,8 @@ function SetUpAdminModal({ onClose, onCreated }: { onClose: () => void; onCreate
             <div className="border-t border-gray-100 pt-4 space-y-3">
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide">Details</label>
               {([
-                ["Full name",     "name",     "text",     true],
-                ["Email address", "email",    "email",    true],
-                ["Password",      "password", "password", true],
+                ["Full name",     "name",  "text",  true],
+                ["Email address", "email", "email", true],
               ] as const).map(([label, key, type, required]) => (
                 <div key={key}>
                   <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -242,6 +242,28 @@ function SetUpAdminModal({ onClose, onCreated }: { onClose: () => void; onCreate
                   />
                 </div>
               ))}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Password<span className="text-red-400 ml-0.5">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={form.password}
+                    onChange={set("password")}
+                    required
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {error && (
