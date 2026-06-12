@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, LayoutDashboard } from "lucide-react";
@@ -23,6 +25,9 @@ const statusColors: Record<string, string> = {
 
 export default async function TechnicianDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session   = await getServerSession(authOptions);
+  const adminRole = (session?.user as any)?.adminRole ?? null;
+  const isSenior  = !adminRole || adminRole === "SENIOR";
 
   const technician = await prisma.technician.findUnique({
     where: { id },
@@ -67,7 +72,7 @@ export default async function TechnicianDetailPage({ params }: { params: Promise
       </div>
 
       {/* Profile card with edit */}
-      <TechnicianProfile technician={technician} />
+      <TechnicianProfile technician={technician} isSenior={isSenior} />
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4">

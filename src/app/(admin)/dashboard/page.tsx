@@ -1,5 +1,7 @@
 import Link from "next/link";
 import SignOutButton from "@/components/SignOutButton";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar, AlertCircle, PoundSterling,
@@ -177,22 +179,27 @@ async function getDashboardData() {
 }
 
 export default async function DashboardPage() {
+  const session   = await getServerSession(authOptions);
+  const adminRole = (session?.user as any)?.adminRole ?? null;
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+
   const d = await getDashboardData();
 
   const now      = new Date();
   const dateStr  = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
-  // First 4 shown on mobile; all 8 shown on desktop
-  const statCards = [
-    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,      icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers" },
-    { label: "Active customers",     value: d.activeCount,                      icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers" },
-    { label: "Visits this week",     value: d.visitsThisWeek,                   icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits" },
-    { label: "Unassigned visits",    value: d.unassignedVisits.length,          icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits" },
-    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers" },
-    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties" },
-    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits" },
-    { label: "Emergency visits",     value: d.emergencyVisits,                  icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits" },
+  // Revenue cards hidden for STANDARD admins
+  const allStatCards = [
+    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,      icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers", seniorOnly: true },
+    { label: "Active customers",     value: d.activeCount,                      icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers", seniorOnly: false },
+    { label: "Visits this week",     value: d.visitsThisWeek,                   icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits",    seniorOnly: false },
+    { label: "Unassigned visits",    value: d.unassignedVisits.length,          icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits",    seniorOnly: false },
+    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers", seniorOnly: true },
+    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties", seniorOnly: false },
+    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits",    seniorOnly: false },
+    { label: "Emergency visits",     value: d.emergencyVisits,                  icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits",    seniorOnly: false },
   ];
+  const statCards = allStatCards.filter(c => isSenior || !c.seniorOnly);
 
   const tierOrder  = ["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"];
   const tierBarColors: Record<string, string> = {

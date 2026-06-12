@@ -34,7 +34,7 @@ function Field({
   );
 }
 
-export default function TechnicianProfile({ technician }: { technician: Technician }) {
+export default function TechnicianProfile({ technician, isSenior = true }: { technician: Technician; isSenior?: boolean }) {
   const router  = useRouter();
   const fileRef       = useRef<HTMLInputElement>(null);
   const videoRef      = useRef<HTMLVideoElement>(null);
@@ -230,12 +230,14 @@ export default function TechnicianProfile({ technician }: { technician: Technici
           </div>
         </div>
 
-        <button
-          onClick={() => { setEditing(e => !e); setStatus(null); }}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-xl transition-colors"
-        >
-          {editing ? <><X className="w-3.5 h-3.5" /> Cancel</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
-        </button>
+        {isSenior && (
+          <button
+            onClick={() => { setEditing(e => !e); setStatus(null); }}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-xl transition-colors"
+          >
+            {editing ? <><X className="w-3.5 h-3.5" /> Cancel</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
+          </button>
+        )}
       </div>
 
       {editing ? (

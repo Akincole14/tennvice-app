@@ -5,10 +5,11 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
-  }
+  const session   = await getServerSession(authOptions);
+  const user      = session?.user as any;
+  if (user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  const isSenior  = !user?.adminRole || user?.adminRole === "SENIOR";
+  if (!isSenior) return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
 
   const { id } = await params;
   const {

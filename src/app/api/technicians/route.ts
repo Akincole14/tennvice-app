@@ -5,10 +5,12 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if ((session?.user as any)?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
-  }
+  const session   = await getServerSession(authOptions);
+  const user      = session?.user as any;
+  if (user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  const adminRole = user?.adminRole ?? null;
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+  if (!isSenior) return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
 
   const {
     name, email, phone, password, qualification, licenceNumber,
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       name: name.trim(),
       email: email.trim(),
@@ -47,5 +49,5 @@ export async function POST(req: NextRequest) {
     include: { technician: true },
   });
 
-  return NextResponse.json(user, { status: 201 });
+  return NextResponse.json(newUser, { status: 201 });
 }

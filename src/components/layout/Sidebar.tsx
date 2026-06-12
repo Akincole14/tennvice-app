@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench, ClipboardList, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Home, Calendar, FileText, LogOut, Wrench, ClipboardList, Settings, ShieldCheck } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -24,14 +24,18 @@ export default function Sidebar({
   role,
   name,
   photo,
+  adminRole,
 }: {
   role: "ADMIN" | "TECHNICIAN" | "CUSTOMER";
   name?: string;
   photo?: string | null;
+  adminRole?: string | null;
 }) {
-  const pathname = usePathname();
-  const nav      = role === "CUSTOMER" ? customerNav : adminNav;
-  const initial  = (name ?? "A").charAt(0).toUpperCase();
+  const pathname  = usePathname();
+  const nav       = role === "CUSTOMER" ? customerNav : adminNav;
+  const initial   = (name ?? "A").charAt(0).toUpperCase();
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+  const roleLabel = isSenior ? "Senior Admin" : "Admin";
 
   return (
     <aside className="hidden md:flex w-60 min-h-screen bg-white border-r border-gray-200 flex-col">
@@ -54,7 +58,7 @@ export default function Sidebar({
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
-              <p className="text-xs text-brand-600">Administrator</p>
+              <p className="text-xs text-brand-600">{roleLabel}</p>
             </div>
           </div>
         </div>
@@ -77,6 +81,20 @@ export default function Sidebar({
               {label}
             </Link>
           ))}
+          {isSenior && (
+            <Link
+              href="/admins"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                pathname.startsWith("/admins")
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              )}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Admins
+            </Link>
+          )}
         </div>
 
         <div className="mt-auto pt-3 border-t border-gray-100 space-y-1">

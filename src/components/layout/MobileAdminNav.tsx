@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Calendar, Wrench,
-  Home, ClipboardList, Settings, LogOut, X,
+  Home, ClipboardList, Settings, LogOut, X, ShieldCheck,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -17,16 +17,22 @@ const navItems = [
   { href: "/technicians", label: "Technicians", icon: Wrench,          exact: false },
 ];
 
-const moreItems = [
+const baseMoreItems = [
   { href: "/properties", icon: Home,          label: "Properties"       },
   { href: "/reports",    icon: ClipboardList, label: "Reports"          },
   { href: "/account",    icon: Settings,      label: "Account settings" },
 ];
+const seniorMoreItems = [
+  ...baseMoreItems,
+  { href: "/admins", icon: ShieldCheck, label: "Admins" },
+];
 
-export default function MobileAdminNav({ name, photo }: { name: string; photo?: string | null }) {
-  const pathname = usePathname();
+export default function MobileAdminNav({ name, photo, adminRole }: { name: string; photo?: string | null; adminRole?: string | null }) {
+  const pathname  = usePathname();
   const [open, setOpen] = useState(false);
-  const initial = (name || "A").charAt(0).toUpperCase();
+  const initial   = (name || "A").charAt(0).toUpperCase();
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+  const roleLabel = isSenior ? "Senior Admin" : "Admin";
 
   const isActive = (href: string, exact: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
@@ -100,7 +106,7 @@ export default function MobileAdminNav({ name, photo }: { name: string; photo?: 
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{name}</p>
-                <p className="text-xs text-brand-600">Administrator</p>
+                <p className="text-xs text-brand-600">{roleLabel}</p>
               </div>
             </div>
             <button
@@ -112,7 +118,7 @@ export default function MobileAdminNav({ name, photo }: { name: string; photo?: 
           </div>
 
           <nav className="px-4 py-3 space-y-1">
-            {moreItems.map(({ href, icon: Icon, label }) => (
+            {(isSenior ? seniorMoreItems : baseMoreItems).map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 href={href}

@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import TechniciansClient from "./TechniciansClient";
 import SignOutButton from "@/components/SignOutButton";
 
@@ -28,6 +30,10 @@ async function getData() {
 }
 
 export default async function TechniciansPage() {
+  const session   = await getServerSession(authOptions);
+  const adminRole = (session?.user as any)?.adminRole ?? null;
+  const isSenior  = !adminRole || adminRole === "SENIOR";
+
   const { technicians, unassigned } = await getData();
 
   const totalCompleted = technicians.reduce(
@@ -62,7 +68,7 @@ export default async function TechniciansPage() {
         ))}
       </div>
 
-      <TechniciansClient technicians={technicians} />
+      <TechniciansClient technicians={technicians} isSenior={isSenior} />
     </div>
   );
 }

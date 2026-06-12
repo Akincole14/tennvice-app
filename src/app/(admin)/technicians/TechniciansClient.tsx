@@ -406,7 +406,7 @@ function AddTechnicianModal({ onClose, onCreated }: { onClose: () => void; onCre
   );
 }
 
-export default function TechniciansClient({ technicians: initial }: { technicians: Technician[] }) {
+export default function TechniciansClient({ technicians: initial, isSenior = true }: { technicians: Technician[]; isSenior?: boolean }) {
   const [technicians, setTechnicians] = useState(initial);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -447,12 +447,14 @@ export default function TechniciansClient({ technicians: initial }: { technician
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition-colors shrink-0"
-          >
-            <Plus className="w-4 h-4" /> <span>Add</span>
-          </button>
+          {isSenior && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-700 transition-colors shrink-0"
+            >
+              <Plus className="w-4 h-4" /> <span>Add</span>
+            </button>
+          )}
         </div>
 
         {added && (

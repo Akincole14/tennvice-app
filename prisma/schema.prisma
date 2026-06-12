@@ -57,6 +57,7 @@ model User {
   image         String?
   passwordHash  String?
   role          String      @default("CUSTOMER")
+  adminRole     String?     // "SENIOR" | "STANDARD" — only set for ADMIN users; null treated as SENIOR
   phone         String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

@@ -15,13 +15,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const dbUser = await prisma.user.findUnique({
     where:  { id: user.id },
-    select: { image: true },
+    select: { image: true, adminRole: true },
   });
+
+  const adminRole = dbUser?.adminRole ?? null; // null treated as SENIOR
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar role="ADMIN" name={user.name ?? "Admin"} photo={dbUser?.image ?? null} />
-      <MobileAdminNav name={user.name ?? "Admin"} photo={dbUser?.image ?? null} />
+      <Sidebar role="ADMIN" name={user.name ?? "Admin"} photo={dbUser?.image ?? null} adminRole={adminRole} />
+      <MobileAdminNav name={user.name ?? "Admin"} photo={dbUser?.image ?? null} adminRole={adminRole} />
       <main className="flex-1 bg-gray-50 pt-[116px] px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
         {children}
       </main>
