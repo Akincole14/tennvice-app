@@ -209,29 +209,29 @@ export default async function OwnerDashboardPage() {
           </div>
           <div className="divide-y divide-amber-100">
             {d.pendingEnquiries.map(c => (
-              <div key={c.id} className="flex items-center gap-4 px-6 py-4">
+              <div key={c.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-6 py-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900">{c.user.name ?? "—"}</p>
-                  <p className="text-sm text-gray-500">{c.user.email}</p>
+                  <p className="text-sm text-gray-500 truncate">{c.user.email}</p>
                   {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
                 </div>
-                <div className="text-right shrink-0 space-y-0.5">
+                <div className="flex sm:flex-col sm:text-right sm:shrink-0 items-center sm:items-end gap-3 sm:gap-0.5">
                   {c.landlordProperties ? (
                     <>
-                      <p className="text-sm font-semibold text-amber-800">{c.landlordProperties} properties</p>
-                      {c.landlordRooms && <p className="text-xs text-amber-700">{c.landlordRooms} rooms each</p>}
+                      <span className="text-sm font-semibold text-amber-800">{c.landlordProperties} properties</span>
+                      {c.landlordRooms && <span className="text-xs text-amber-700">{c.landlordRooms} rooms each</span>}
                     </>
                   ) : (
-                    <p className="text-xs text-gray-400 italic">No details submitted</p>
+                    <span className="text-xs text-gray-400 italic">No details submitted</span>
                   )}
-                  <p className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 sm:mt-0.5">
                     {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
+                  </span>
                 </div>
-                <div className="shrink-0 flex flex-col gap-2">
+                <div className="flex sm:flex-col sm:shrink-0 gap-2">
                   <a
                     href={buildMailto(c.user.email ?? "", c.user.name ?? "Customer", c.landlordProperties, c.landlordRooms)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors whitespace-nowrap"
                   >
                     <Mail className="w-3.5 h-3.5" />
                     Send quote

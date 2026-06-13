@@ -156,55 +156,61 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
 
       {/* Landlord enquiry panel */}
       {customer.subscriptionStatus === "PENDING" && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-amber-600 shrink-0" />
-            <p className="font-semibold text-amber-900">Landlord Enquiry — Pending quote</p>
-            <span className="ml-auto text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">Pending</span>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-4">
+          <div className="flex items-start gap-2">
+            <Building2 className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-semibold text-amber-900">Landlord Enquiry</p>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">Pending quote</span>
+              </div>
+              <p className="text-xs text-amber-700 mt-1">
+                A quote needs to be sent before this account can be activated.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-amber-700">
-            This customer submitted a landlord enquiry. A quote needs to be sent before their account can be activated.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
-              <p className="text-xs text-gray-500 mb-0.5">Number of properties</p>
-              <p className="font-semibold text-gray-900">{customer.landlordProperties ?? "—"}</p>
+              <p className="text-xs text-gray-500 mb-1">No. of properties</p>
+              <p className="font-semibold text-gray-900 text-lg leading-tight">{customer.landlordProperties ?? "—"}</p>
             </div>
             <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
-              <p className="text-xs text-gray-500 mb-0.5">Rooms per property</p>
-              <p className="font-semibold text-gray-900">{customer.landlordRooms ? `${customer.landlordRooms} rooms` : "—"}</p>
+              <p className="text-xs text-gray-500 mb-1">Rooms per property</p>
+              <p className="font-semibold text-gray-900 text-lg leading-tight">{customer.landlordRooms ?? "—"}</p>
             </div>
             <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
-              <p className="text-xs text-gray-500 mb-0.5">Property type</p>
+              <p className="text-xs text-gray-500 mb-1">Property type</p>
               <p className="font-semibold text-gray-900">{customer.properties[0]?.propertyType ?? "—"}</p>
             </div>
-            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3 sm:col-span-2">
-              <p className="text-xs text-gray-500 mb-0.5">Registered address</p>
-              <p className="font-semibold text-gray-900">{customer.properties[0]?.address ?? "—"}</p>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3 col-span-2">
+              <p className="text-xs text-gray-500 mb-1">Registered address</p>
+              <p className="font-semibold text-gray-900 break-words">{customer.properties[0]?.address ?? "—"}</p>
               {customer.properties[0]?.postcode && (
-                <p className="text-xs text-gray-500">{customer.properties[0].postcode}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{customer.properties[0].postcode}</p>
               )}
             </div>
-            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
-              <p className="text-xs text-gray-500 mb-0.5">Contact</p>
-              <p className="font-semibold text-gray-900 truncate">{customer.user.email}</p>
-              {customer.user.phone && <p className="text-xs text-gray-500">{customer.user.phone}</p>}
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3 col-span-2 sm:col-span-1">
+              <p className="text-xs text-gray-500 mb-1">Contact</p>
+              <p className="font-semibold text-gray-900 break-all text-sm">{customer.user.email}</p>
+              {customer.user.phone && <p className="text-xs text-gray-500 mt-0.5">{customer.user.phone}</p>}
             </div>
           </div>
-          <div className="flex items-center justify-between pt-1">
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 border-t border-amber-100">
             <p className="text-xs text-gray-400">
               Submitted {new Date(customer.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
             </p>
-          </div>
-          <div className="pt-1 flex items-center gap-3">
-            <a
-              href={buildMailto(customer.user.email ?? "", customer.user.name ?? "Customer", customer.landlordProperties, customer.landlordRooms)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors"
-            >
-              <Mail className="w-4 h-4" />
-              Send quote email
-            </a>
-            <QuoteSentButton customerId={customer.id} quoteSentAt={customer.landlordQuoteSentAt} />
+            <div className="flex items-center gap-3 flex-wrap">
+              <a
+                href={buildMailto(customer.user.email ?? "", customer.user.name ?? "Customer", customer.landlordProperties, customer.landlordRooms)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors whitespace-nowrap"
+              >
+                <Mail className="w-4 h-4 shrink-0" />
+                Send quote email
+              </a>
+              <QuoteSentButton customerId={customer.id} quoteSentAt={customer.landlordQuoteSentAt} />
+            </div>
           </div>
         </div>
       )}
@@ -327,24 +333,25 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                 key={property.id}
                 className="bg-white rounded-2xl border border-gray-200 p-5"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex items-start gap-3 min-w-0">
                     <div className="p-2 bg-brand-50 rounded-xl shrink-0">
                       <Home className="w-4 h-4 text-brand-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{property.address}</p>
-                      <p className="text-sm text-gray-500">
-                        {(property as any).postcode} · {(property as any).propertyType}
+                      <p className="font-semibold text-gray-900 break-words">{property.address}</p>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {(property as any).postcode}
+                        {(property as any).propertyType ? ` · ${(property as any).propertyType}` : ""}
                         {(property as any).bedrooms ? ` · ${(property as any).bedrooms} bed` : ""}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 sm:shrink-0 pl-9 sm:pl-0">
                     {hasFollowUp && <AlertTriangle className="w-4 h-4 text-amber-500" />}
                     <Link
                       href={`/portal/report/${property.id}`}
-                      className="flex items-center gap-1.5 text-xs text-brand-600 border border-brand-200 rounded-lg px-3 py-1.5 hover:bg-brand-50 font-medium transition-colors"
+                      className="flex items-center gap-1.5 text-xs text-brand-600 border border-brand-200 rounded-lg px-3 py-1.5 hover:bg-brand-50 font-medium transition-colors whitespace-nowrap"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       Service report
@@ -373,13 +380,13 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
 
                 {/* Recent visits */}
                 {property.visits.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                  <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Visits</p>
                     {property.visits.slice(0, 4).map((v) => (
                       <Link
                         key={v.id}
                         href={`/visits/${v.id}`}
-                        className="flex items-center justify-between hover:bg-gray-50 rounded-lg px-2 py-1.5 -mx-2 transition-colors group"
+                        className="flex items-center justify-between gap-3 hover:bg-gray-50 rounded-lg px-2 py-2 -mx-2 transition-colors group"
                       >
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-gray-900 group-hover:text-brand-600">
@@ -387,12 +394,12 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                               weekday: "short", day: "numeric", month: "short", year: "numeric",
                             })}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 truncate">
                             {typeLabels[v.type] ?? v.type}
                             {v.technician ? ` · ${v.technician.user.name}` : ""}
                           </p>
                         </div>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ml-3 ${statusColors[v.status]}`}>
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap ${statusColors[v.status]}`}>
                           {v.status.replace("_", " ")}
                         </span>
                       </Link>
