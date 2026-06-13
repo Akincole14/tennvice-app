@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
@@ -16,10 +16,12 @@ export async function PATCH(
   }
 
   const { id } = await params;
+  const body = await req.json().catch(() => ({}));
+  const clear = body?.clear === true;
 
   const customer = await prisma.customer.update({
     where: { id },
-    data:  { landlordQuoteSentAt: new Date() },
+    data:  { landlordQuoteSentAt: clear ? null : new Date() },
     select: { landlordQuoteSentAt: true },
   });
 
