@@ -165,7 +165,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
           <p className="text-xs text-amber-700">
             This customer submitted a landlord enquiry. A quote needs to be sent before their account can be activated.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
             <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
               <p className="text-xs text-gray-500 mb-0.5">Number of properties</p>
               <p className="font-semibold text-gray-900">{customer.landlordProperties ?? "—"}</p>
@@ -175,16 +175,26 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
               <p className="font-semibold text-gray-900">{customer.landlordRooms ? `${customer.landlordRooms} rooms` : "—"}</p>
             </div>
             <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
+              <p className="text-xs text-gray-500 mb-0.5">Property type</p>
+              <p className="font-semibold text-gray-900">{customer.properties[0]?.propertyType ?? "—"}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3 sm:col-span-2">
+              <p className="text-xs text-gray-500 mb-0.5">Registered address</p>
+              <p className="font-semibold text-gray-900">{customer.properties[0]?.address ?? "—"}</p>
+              {customer.properties[0]?.postcode && (
+                <p className="text-xs text-gray-500">{customer.properties[0].postcode}</p>
+              )}
+            </div>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
               <p className="text-xs text-gray-500 mb-0.5">Contact</p>
               <p className="font-semibold text-gray-900 truncate">{customer.user.email}</p>
               {customer.user.phone && <p className="text-xs text-gray-500">{customer.user.phone}</p>}
             </div>
-            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
-              <p className="text-xs text-gray-500 mb-0.5">Submitted</p>
-              <p className="font-semibold text-gray-900">
-                {new Date(customer.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-              </p>
-            </div>
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-xs text-gray-400">
+              Submitted {new Date(customer.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+            </p>
           </div>
           <div className="pt-1 flex items-center gap-3">
             <a

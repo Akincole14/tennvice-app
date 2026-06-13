@@ -347,10 +347,19 @@ function Step4({ data, isLandlord }: { data: FormData; isLandlord: boolean }) {
             ))}
           </ul>
         </div>
-        <div className="rounded-2xl border border-gray-200 p-4 space-y-1.5">
-          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Submission summary</p>
-          <p className="text-sm text-gray-600">{data.landlordProperties ? `${data.landlordProperties} propert${data.landlordProperties === "1" ? "y" : "ies"}` : ""}{data.landlordRooms ? ` · ${data.landlordRooms} rooms each` : ""}</p>
-          <p className="text-sm text-gray-600">{data.address}{data.postcode ? `, ${data.postcode}` : ""}</p>
+        <div className="rounded-2xl border border-gray-200 p-4 space-y-2">
+          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Submission summary</p>
+          {[
+            { label: "Number of properties", value: data.landlordProperties || "—" },
+            { label: "Rooms per property",   value: data.landlordRooms ? `${data.landlordRooms} rooms` : "—" },
+            { label: "Property type",        value: data.propertyType || "—" },
+            { label: "Address",              value: [data.address, data.postcode].filter(Boolean).join(", ") || "—" },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex items-start justify-between gap-4 text-sm">
+              <span className="text-gray-400 shrink-0">{label}</span>
+              <span className="text-gray-700 font-medium text-right">{value}</span>
+            </div>
+          ))}
         </div>
       </div>
     );
