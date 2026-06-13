@@ -85,8 +85,9 @@ model Customer {
   emergencyCallouts  Int        @default(0)
   discountPercent    Int        @default(20)
   // Landlord enquiry data
-  landlordProperties String?    // e.g. "5" or "10+"
-  landlordRooms      String?    // e.g. "2-4"
+  landlordProperties  String?    // e.g. "5" or "10+"
+  landlordRooms       String?    // e.g. "2-4"
+  landlordQuoteSentAt DateTime?  // set when staff mark the quote as sent
   // GoCardless Direct Debit
   gcBillingRequestId String?    // temporary reference during redirect flow
   gcMandateId        String?    // e.g. MD0000XXXX

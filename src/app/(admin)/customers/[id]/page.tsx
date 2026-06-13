@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText, Building2, Mail } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
+import QuoteSentButton from "@/components/QuoteSentButton";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -185,7 +186,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
               </p>
             </div>
           </div>
-          <div className="pt-1">
+          <div className="pt-1 flex items-center gap-3">
             <a
               href={buildMailto(customer.user.email ?? "", customer.user.name ?? "Customer", customer.landlordProperties, customer.landlordRooms)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors"
@@ -193,6 +194,7 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
               <Mail className="w-4 h-4" />
               Send quote email
             </a>
+            <QuoteSentButton customerId={customer.id} quoteSentAt={customer.landlordQuoteSentAt} />
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SignOutButton from "@/components/SignOutButton";
+import QuoteSentButton from "@/components/QuoteSentButton";
 import { TIER_LABELS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -182,8 +183,12 @@ async function getDashboardData() {
       take: 4,
     }),
     prisma.customer.findMany({
-      where: { subscriptionStatus: "PENDING" },
-      include: { user: { select: { name: true, email: true, phone: true } } },
+      where:  { subscriptionStatus: "PENDING" },
+      select: {
+        id: true, createdAt: true,
+        landlordProperties: true, landlordRooms: true, landlordQuoteSentAt: true,
+        user: { select: { name: true, email: true, phone: true } },
+      },
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -328,13 +333,16 @@ export default async function DashboardPage() {
                     {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
-                <a
-                  href={buildMailto(c.user.email ?? "", c.user.name ?? "Customer", c.landlordProperties, c.landlordRooms)}
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  Send quote
-                </a>
+                <div className="shrink-0 flex flex-col gap-2">
+                  <a
+                    href={buildMailto(c.user.email ?? "", c.user.name ?? "Customer", c.landlordProperties, c.landlordRooms)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    Send quote
+                  </a>
+                  <QuoteSentButton customerId={c.id} quoteSentAt={c.landlordQuoteSentAt} />
+                </div>
               </div>
             ))}
           </div>
