@@ -142,7 +142,7 @@ export default function ChampionCarousel() {
         <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-white/5 blur-3xl" />
       </div>
 
-      <div className="relative max-w-5xl mx-auto">
+      <div className="relative w-full">
         {/* Header row */}
         <div className="flex items-center justify-between mb-10">
           <div>
