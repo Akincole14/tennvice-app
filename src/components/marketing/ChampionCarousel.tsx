@@ -22,8 +22,8 @@ const slides = [
           { icon: BookOpen,      label: "Running home logbook",       sub: "Full history, always accessible"     },
           { icon: BadgeCheck,    label: "Certified trade work",       sub: "Gas Safe, NICEIC & more"             },
         ].map(({ icon: Icon, label, sub }) => (
-          <div key={label} className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-4 flex items-start gap-3 shadow-lg shadow-black/20">
-            <div className="w-9 h-9 rounded-xl bg-white/30 flex items-center justify-center shrink-0">
+          <div key={label} className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-4 flex items-start gap-3 shadow-lg shadow-black/20">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <Icon className="w-4 h-4 text-gray-900" />
             </div>
             <div>
@@ -48,7 +48,7 @@ const slides = [
           { icon: Flame,         label: "Boiler",      desc: "Annual service, efficiency check, flue & pressure test"        },
           { icon: AlertTriangle, label: "Emergency",   desc: "Same-week call-outs for urgent plumbing or electrical faults"  },
         ].map(({ icon: Icon, label, desc }) => (
-          <div key={label} className="bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-lg shadow-black/20">
+          <div key={label} className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-lg shadow-black/20">
             <div className="flex items-center gap-2 mb-2">
               <Icon className="w-5 h-5 text-gray-900" />
               <span className="text-sm font-bold text-gray-900">{label}</span>
@@ -71,8 +71,8 @@ const slides = [
           { num: "02", title: "We schedule your visits", desc: "We match you with a local certified technician and book visits at times that work for you."                         },
           { num: "03", title: "Receive your report",    desc: "After every visit you get a signed inspection report with results, recommendations, and your running service history." },
         ].map(({ num, title, desc }) => (
-          <div key={num} className="flex items-start gap-4 bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-lg shadow-black/20">
-            <div className="w-10 h-10 rounded-xl bg-white/30 flex items-center justify-center shrink-0 font-bold text-gray-900 text-sm">
+          <div key={num} className="flex items-start gap-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-lg shadow-black/20">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 font-bold text-gray-900 text-sm">
               {num}
             </div>
             <div>
@@ -99,8 +99,8 @@ const slides = [
           { icon: Star,          label: "Verified technicians",     sub: "Only top-rated, certified engineers"       },
           { icon: CheckCircle,   label: "Cancel any time",          sub: "No long contracts or lock-ins"            },
         ].map(({ icon: Icon, label, sub }) => (
-          <div key={label} className="flex items-start gap-3 bg-white/30 backdrop-blur-sm border border-white/30 rounded-2xl p-3 shadow-lg shadow-black/20">
-            <div className="w-8 h-8 rounded-lg bg-white/30 flex items-center justify-center shrink-0 mt-0.5">
+          <div key={label} className="flex items-start gap-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-3 shadow-lg shadow-black/20">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
               <Icon className="w-3.5 h-3.5 text-gray-900" />
             </div>
             <div>
