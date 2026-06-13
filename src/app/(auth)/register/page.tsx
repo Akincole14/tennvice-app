@@ -225,12 +225,10 @@ function Step2({
                 onChange={e => set("landlordRooms", e.target.value)}
               >
                 <option value="">Select…</option>
-                <option value="1">1 room</option>
-                <option value="2">2 rooms</option>
-                <option value="3">3 rooms</option>
-                <option value="4">4 rooms</option>
-                <option value="5">5 rooms</option>
-                <option value="6">6+ rooms</option>
+                <option value="1-2">1–2 rooms</option>
+                <option value="2-4">2–4 rooms</option>
+                <option value="4-6">4–6 rooms</option>
+                <option value="6+">6+ rooms</option>
               </select>
             </Field>
           )}
