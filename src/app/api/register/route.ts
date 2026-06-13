@@ -50,11 +50,13 @@ export async function POST(req: NextRequest) {
       customer: {
         create: {
           subscriptionTier,
-          subscriptionStatus: isLandlord ? "PENDING" : "ACTIVE",
-          visitsPerYear:     tier.visitsPerYear,
-          emergencyCallouts: tier.emergencyCallouts === Infinity ? 999 : tier.emergencyCallouts,
-          discountPercent:   tier.discount,
-          ddStatus:          "PENDING",
+          subscriptionStatus:  isLandlord ? "PENDING" : "ACTIVE",
+          visitsPerYear:       tier.visitsPerYear,
+          emergencyCallouts:   tier.emergencyCallouts === Infinity ? 999 : tier.emergencyCallouts,
+          discountPercent:     tier.discount,
+          ddStatus:            "PENDING",
+          landlordProperties:  isLandlord ? (landlordProperties || null) : null,
+          landlordRooms:       isLandlord ? (landlordRooms      || null) : null,
           properties: {
             create: {
               address,

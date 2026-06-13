@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText } from "lucide-react";
+import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText, Building2 } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
@@ -30,6 +30,7 @@ const subscriptionStatusColors: Record<string, string> = {
   ACTIVE:    "bg-green-100 text-green-700",
   PAUSED:    "bg-yellow-100 text-yellow-700",
   CANCELLED: "bg-red-100 text-red-700",
+  PENDING:   "bg-blue-100 text-blue-700",
 };
 
 function healthColor(result: string) {
@@ -121,6 +122,41 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
           {customer.user.email && <span className="text-gray-400"> · {customer.user.email}</span>}
         </p>
       </div>
+
+      {/* Landlord enquiry panel */}
+      {customer.subscriptionStatus === "PENDING" && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-amber-600 shrink-0" />
+            <p className="font-semibold text-amber-900">Landlord Enquiry — Pending quote</p>
+            <span className="ml-auto text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">Pending</span>
+          </div>
+          <p className="text-xs text-amber-700">
+            This customer submitted a landlord enquiry. A quote needs to be sent before their account can be activated.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
+              <p className="text-xs text-gray-500 mb-0.5">Number of properties</p>
+              <p className="font-semibold text-gray-900">{customer.landlordProperties ?? "—"}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
+              <p className="text-xs text-gray-500 mb-0.5">Rooms per property</p>
+              <p className="font-semibold text-gray-900">{customer.landlordRooms ? `${customer.landlordRooms} rooms` : "—"}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
+              <p className="text-xs text-gray-500 mb-0.5">Contact</p>
+              <p className="font-semibold text-gray-900 truncate">{customer.user.email}</p>
+              {customer.user.phone && <p className="text-xs text-gray-500">{customer.user.phone}</p>}
+            </div>
+            <div className="bg-white rounded-xl border border-amber-100 px-4 py-3">
+              <p className="text-xs text-gray-500 mb-0.5">Submitted</p>
+              <p className="font-semibold text-gray-900">
+                {new Date(customer.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Next visit banner */}
       {nextVisit ? (

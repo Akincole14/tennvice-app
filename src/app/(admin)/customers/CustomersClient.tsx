@@ -37,6 +37,8 @@ type Customer = {
   visitsPerYear: number;
   discountPercent: number;
   createdAt: Date;
+  landlordProperties: string | null;
+  landlordRooms: string | null;
   user: { name: string | null; email: string | null; phone: string | null; createdAt: Date };
   properties: {
     id: string;
@@ -144,6 +146,11 @@ export default function CustomersClient({ customers, isSenior }: { customers: Cu
                     : "none"}
                 </span>
               </div>
+              {c.landlordProperties && (
+                <p className="text-xs text-amber-700 font-medium mt-1">
+                  Enquiry: {c.landlordProperties} properties · {c.landlordRooms ? `${c.landlordRooms} rooms` : "rooms TBC"}
+                </p>
+              )}
             </Link>
           );
         })}
@@ -167,12 +174,13 @@ export default function CustomersClient({ customers, isSenior }: { customers: Cu
               <th className="text-left px-5 py-3 font-medium text-gray-500">Properties</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Last visit</th>
               <th className="text-left px-5 py-3 font-medium text-gray-500">Member since</th>
+              <th className="text-left px-5 py-3 font-medium text-gray-500">Enquiry</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={9} className="text-center py-12 text-gray-400">
+                <td colSpan={10} className="text-center py-12 text-gray-400">
                   No customers match your filters.
                 </td>
               </tr>
@@ -219,6 +227,14 @@ export default function CustomersClient({ customers, isSenior }: { customers: Cu
                     </td>
                     <td className="px-5 py-3 text-gray-500 text-xs">
                       {new Date(c.user.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    </td>
+                    <td className="px-5 py-3 text-xs">
+                      {c.landlordProperties ? (
+                        <span className="inline-flex flex-col gap-0.5 text-amber-700">
+                          <span className="font-medium">{c.landlordProperties} props</span>
+                          {c.landlordRooms && <span>{c.landlordRooms} rooms</span>}
+                        </span>
+                      ) : <span className="text-gray-300">—</span>}
                     </td>
                   </tr>
                 );

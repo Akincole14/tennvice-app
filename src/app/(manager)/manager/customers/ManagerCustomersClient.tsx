@@ -30,6 +30,8 @@ type Customer = {
   visitsPerYear: number;
   discountPercent: number;
   createdAt: Date;
+  landlordProperties: string | null;
+  landlordRooms: string | null;
   userId: string;
   user: { name: string | null; email: string | null; phone: string | null; createdAt: Date };
   properties: {
@@ -142,6 +144,11 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
                   {deletingId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 </button>
               </div>
+              {c.landlordProperties && (
+                <p className="text-xs text-amber-700 font-medium mt-1">
+                  Enquiry: {c.landlordProperties} properties · {c.landlordRooms ? `${c.landlordRooms} rooms` : "rooms TBC"}
+                </p>
+              )}
             </div>
           );
         })}
@@ -160,12 +167,13 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
                 <th className="text-left px-5 py-3 font-medium text-gray-500">Status</th>
                 <th className="text-left px-5 py-3 font-medium text-gray-500">Properties</th>
                 <th className="text-left px-5 py-3 font-medium text-gray-500">Member since</th>
+                <th className="text-left px-5 py-3 font-medium text-gray-500">Enquiry</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="text-center py-12 text-gray-400">No customers match your filters.</td></tr>
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400">No customers match your filters.</td></tr>
               ) : filtered.map(c => (
                 <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 font-medium text-brand-600">{c.user.name ?? "—"}</td>
@@ -186,6 +194,14 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
                   <td className="px-5 py-3 text-gray-600">{c.properties.length}</td>
                   <td className="px-5 py-3 text-gray-500 text-xs">
                     {new Date(c.user.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                  </td>
+                  <td className="px-5 py-3 text-xs">
+                    {c.landlordProperties ? (
+                      <span className="inline-flex flex-col gap-0.5 text-amber-700">
+                        <span className="font-medium">{c.landlordProperties} props</span>
+                        {c.landlordRooms && <span>{c.landlordRooms} rooms</span>}
+                      </span>
+                    ) : <span className="text-gray-300">—</span>}
                   </td>
                   <td className="px-5 py-3">
                     <button
