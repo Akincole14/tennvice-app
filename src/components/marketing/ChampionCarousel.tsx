@@ -23,7 +23,7 @@ const slides = [
           { icon: BadgeCheck,    label: "Certified trade work",       sub: "Gas Safe, NICEIC & more"             },
         ].map(({ icon: Icon, label, sub }) => (
           <div key={label} className="bg-white/10 border border-white/30 rounded-2xl p-4 flex items-start gap-3 shadow-lg shadow-black/20">
-            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-white/50 flex items-center justify-center shrink-0">
               <Icon className="w-4 h-4 text-gray-900" />
             </div>
             <div>
@@ -72,7 +72,7 @@ const slides = [
           { num: "03", title: "Receive your report",    desc: "After every visit you get a signed inspection report with results, recommendations, and your running service history." },
         ].map(({ num, title, desc }) => (
           <div key={num} className="flex items-start gap-4 bg-white/10 border border-white/30 rounded-2xl p-4 shadow-lg shadow-black/20">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0 font-bold text-gray-900 text-sm">
+            <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center shrink-0 font-bold text-gray-900 text-sm">
               {num}
             </div>
             <div>
@@ -100,7 +100,7 @@ const slides = [
           { icon: CheckCircle,   label: "Cancel any time",          sub: "No long contracts or lock-ins"            },
         ].map(({ icon: Icon, label, sub }) => (
           <div key={label} className="flex items-start gap-3 bg-white/10 border border-white/30 rounded-2xl p-3 shadow-lg shadow-black/20">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-8 h-8 rounded-lg bg-white/50 flex items-center justify-center shrink-0 mt-0.5">
               <Icon className="w-3.5 h-3.5 text-gray-900" />
             </div>
             <div>
