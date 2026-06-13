@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ClipboardList } from "lucide-react";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 import VisitReportsClient, { MonthData } from "./VisitReportsClient";
 
 type Signal = "green" | "amber" | "red";
@@ -93,12 +94,15 @@ export default async function VisitReportsPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 py-4 md:py-8">
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <ClipboardList className="w-6 h-6 text-brand-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Visit Reports</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Monthly performance across all visits</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="w-6 h-6 text-brand-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Visit Reports</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Monthly performance across all visits</p>
+          </div>
         </div>
+        <OwnerSignOutButton />
       </div>
 
       {/* Signal legend */}

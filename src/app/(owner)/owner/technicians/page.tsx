@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OwnerTechniciansClient from "./OwnerTechniciansClient";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 export default async function OwnerTechniciansPage() {
   await getServerSession(authOptions);
@@ -32,7 +33,10 @@ export default async function OwnerTechniciansPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-5 py-4 md:py-8">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Technicians</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Technicians</h1>
+        <OwnerSignOutButton />
+      </div>
       <OwnerTechniciansClient technicians={serialised} />
     </div>
   );

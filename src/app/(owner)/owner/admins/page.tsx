@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ShieldCheck } from "lucide-react";
 import OwnerAdminsClient from "./OwnerAdminsClient";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 export default async function OwnerAdminsPage() {
   await getServerSession(authOptions);
@@ -20,12 +21,15 @@ export default async function OwnerAdminsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4 md:py-8">
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="w-6 h-6 text-brand-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin accounts</h1>
-          <p className="text-sm text-gray-500">View and manage all admin users.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-brand-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin accounts</h1>
+            <p className="text-sm text-gray-500">View and manage all admin users.</p>
+          </div>
         </div>
+        <OwnerSignOutButton />
       </div>
       <OwnerAdminsClient admins={serialised} />
     </div>

@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Star } from "lucide-react";
 import ManagersClient from "./ManagersClient";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 export default async function OwnerManagersPage() {
   await getServerSession(authOptions);
@@ -20,12 +21,15 @@ export default async function OwnerManagersPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4 md:py-8">
-      <div className="flex items-center gap-2">
-        <Star className="w-6 h-6 text-amber-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manager accounts</h1>
-          <p className="text-sm text-gray-500">Manage who has manager-level access to Tennvice.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Star className="w-6 h-6 text-amber-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Manager accounts</h1>
+            <p className="text-sm text-gray-500">Manage who has manager-level access to Tennvice.</p>
+          </div>
         </div>
+        <OwnerSignOutButton />
       </div>
 
       <ManagersClient managers={serialised} />

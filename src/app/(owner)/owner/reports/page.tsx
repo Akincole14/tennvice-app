@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BarChart3 } from "lucide-react";
 import DownloadButton from "./DownloadButton";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -38,7 +39,10 @@ export default async function OwnerReportsPage() {
             <p className="text-sm text-gray-500 mt-0.5">Revenue and subscription breakdown</p>
           </div>
         </div>
-        <DownloadButton />
+        <div className="flex items-center gap-2">
+          <DownloadButton />
+          <OwnerSignOutButton />
+        </div>
       </div>
 
       {/* Revenue summary */}

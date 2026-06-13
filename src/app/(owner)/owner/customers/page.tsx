@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OwnerCustomersClient from "./OwnerCustomersClient";
+import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -39,7 +40,10 @@ export default async function OwnerCustomersPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
-      <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Customers</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Customers</h1>
+        <OwnerSignOutButton />
+      </div>
 
       {/* Stats bar */}
       <div className="grid gap-3 md:gap-4 grid-cols-3 sm:grid-cols-5">
