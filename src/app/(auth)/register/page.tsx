@@ -36,12 +36,15 @@ type FormData = {
   ownershipType: string;
   bedrooms: string;
   subscriptionTier: string;
+  landlordProperties: string;
+  landlordRooms: string;
 };
 
 const INITIAL: FormData = {
   name: "", email: "", phone: "", password: "", confirmPassword: "",
   address: "", postcode: "", propertyType: "House", ownershipType: "OWNER", bedrooms: "",
   subscriptionTier: "STANDARD",
+  landlordProperties: "", landlordRooms: "",
 };
 
 // ─── Step indicator ───────────────────────────────────────────────────────────
@@ -197,6 +200,43 @@ function Step2({
           </select>
         </Field>
       </div>
+
+      {data.ownershipType === "LANDLORD" && (
+        <div className="space-y-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-4">
+          <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide">Landlord details</p>
+          <Field label="Number of properties">
+            <select
+              className={inputCls()}
+              value={data.landlordProperties}
+              onChange={e => { set("landlordProperties", e.target.value); set("landlordRooms", ""); }}
+            >
+              <option value="">Select…</option>
+              {["1","2","3","4","5","6","7","8","9","10+"].map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </Field>
+
+          {data.landlordProperties && (
+            <Field label="Rooms per property">
+              <select
+                className={inputCls()}
+                value={data.landlordRooms}
+                onChange={e => set("landlordRooms", e.target.value)}
+              >
+                <option value="">Select…</option>
+                <option value="1">1 room</option>
+                <option value="2">2 rooms</option>
+                <option value="3">3 rooms</option>
+                <option value="4">4 rooms</option>
+                <option value="5">5 rooms</option>
+                <option value="6">6+ rooms</option>
+              </select>
+            </Field>
+          )}
+        </div>
+      )}
+
       <Field label="Bedrooms (optional)">
         <select className={inputCls()} value={data.bedrooms} onChange={e => set("bedrooms", e.target.value)}>
           <option value="">Select…</option>
@@ -381,16 +421,18 @@ export default function RegisterPage() {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
-          name:             form.name,
-          email:            form.email,
-          phone:            form.phone,
-          password:         form.password,
-          address:          form.address,
-          postcode:         form.postcode,
-          propertyType:     form.propertyType,
-          ownershipType:    form.ownershipType,
-          bedrooms:         form.bedrooms,
-          subscriptionTier: form.subscriptionTier,
+          name:               form.name,
+          email:              form.email,
+          phone:              form.phone,
+          password:           form.password,
+          address:            form.address,
+          postcode:           form.postcode,
+          propertyType:       form.propertyType,
+          ownershipType:      form.ownershipType,
+          bedrooms:           form.bedrooms,
+          subscriptionTier:   form.subscriptionTier,
+          landlordProperties: form.landlordProperties || undefined,
+          landlordRooms:      form.landlordRooms || undefined,
         }),
       });
 
