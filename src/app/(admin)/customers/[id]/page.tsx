@@ -333,29 +333,17 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                 key={property.id}
                 className="bg-white rounded-2xl border border-gray-200 p-5"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="p-2 bg-brand-50 rounded-xl shrink-0">
-                      <Home className="w-4 h-4 text-brand-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 break-words">{property.address}</p>
-                      <p className="text-sm text-gray-500 mt-0.5">
-                        {(property as any).postcode}
-                        {(property as any).propertyType ? ` · ${(property as any).propertyType}` : ""}
-                        {(property as any).bedrooms ? ` · ${(property as any).bedrooms} bed` : ""}
-                      </p>
-                    </div>
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="p-2 bg-brand-50 rounded-xl shrink-0">
+                    <Home className="w-4 h-4 text-brand-600" />
                   </div>
-                  <div className="flex items-center gap-2 sm:shrink-0 pl-9 sm:pl-0">
-                    {hasFollowUp && <AlertTriangle className="w-4 h-4 text-amber-500" />}
-                    <Link
-                      href={`/portal/report/${property.id}`}
-                      className="flex items-center gap-1.5 text-xs text-brand-600 border border-brand-200 rounded-lg px-3 py-1.5 hover:bg-brand-50 font-medium transition-colors whitespace-nowrap"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      Service report
-                    </Link>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 break-words">{property.address}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      {(property as any).postcode}
+                      {(property as any).propertyType ? ` · ${(property as any).propertyType}` : ""}
+                      {(property as any).bedrooms ? ` · ${(property as any).bedrooms} bed` : ""}
+                    </p>
                   </div>
                 </div>
 
@@ -375,6 +363,16 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                   <div>
                     <p className="text-xs text-gray-400">Total visits</p>
                     <p className="font-medium text-gray-700">{property.visits.length}</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-2">
+                    {hasFollowUp && <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
+                    <Link
+                      href={`/portal/report/${property.id}`}
+                      className="flex items-center gap-1.5 text-xs text-brand-600 border border-brand-200 rounded-lg px-3 py-1.5 hover:bg-brand-50 font-medium transition-colors whitespace-nowrap"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Service report
+                    </Link>
                   </div>
                 </div>
 
