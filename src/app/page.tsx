@@ -240,14 +240,14 @@ export default function HomePage() {
                       ))}
                     </ul>
                     <a
-                      href={key === "ENTERPRISE" ? "/contact" : "/login"}
+                      href={key === "ENTERPRISE" ? "/register?type=landlord" : "/register"}
                       className={`block text-center text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors ${
                         highlighted
                           ? "bg-brand-600 text-white hover:bg-brand-700"
                           : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                     >
-                      {key === "ENTERPRISE" ? "Contact us" : "Get started"}
+                      {key === "ENTERPRISE" ? "Get a quote" : "Get started"}
                     </a>
                   </div>
                 );

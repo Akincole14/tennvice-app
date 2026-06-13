@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Check,
   ChevronRight,
@@ -418,13 +418,20 @@ function Step4({ data, isLandlord }: { data: FormData; isLandlord: boolean }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
-  const router  = useRouter();
+  const router       = useRouter();
+  const searchParams = useSearchParams();
   const [step,              setStep]              = useState(0);
   const [form,              setForm]              = useState<FormData>(INITIAL);
   const [errors,            setErrors]            = useState<Partial<Record<keyof FormData, string>>>({});
   const [apiErr,            setApiErr]            = useState<string | null>(null);
   const [loading,           setLoading]           = useState(false);
   const [landlordSubmitted, setLandlordSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("type") === "landlord") {
+      setForm(f => ({ ...f, ownershipType: "LANDLORD" }));
+    }
+  }, [searchParams]);
 
   const isLandlord = form.ownershipType === "LANDLORD";
 
