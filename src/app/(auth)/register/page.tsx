@@ -163,8 +163,9 @@ function Step1({
 
 const PROPERTY_TYPES  = ["House", "Flat", "Bungalow", "Maisonette", "Other"];
 const OWNERSHIP_TYPES = [
-  { value: "OWNER",  label: "Owner-occupied" },
-  { value: "TENANT", label: "Tenant" },
+  { value: "OWNER",    label: "Owner-occupied" },
+  { value: "TENANT",   label: "Tenant" },
+  { value: "LANDLORD", label: "Landlord" },
 ];
 
 function Step2({
