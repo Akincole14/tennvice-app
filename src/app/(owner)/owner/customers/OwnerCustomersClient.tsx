@@ -16,6 +16,7 @@ const statusColors: Record<string, string> = {
   ACTIVE:    "bg-green-100 text-green-700",
   PAUSED:    "bg-yellow-100 text-yellow-700",
   CANCELLED: "bg-red-100 text-red-700",
+  PENDING:   "bg-blue-100 text-blue-700",
 };
 
 const TIER_PRICES: Record<string, number> = {
@@ -101,6 +102,7 @@ export default function OwnerCustomersClient({ customers: initial }: { customers
             <option value="ACTIVE">Active</option>
             <option value="PAUSED">Paused</option>
             <option value="CANCELLED">Cancelled</option>
+            <option value="PENDING">Pending quote</option>
           </select>
         </div>
       </div>

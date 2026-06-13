@@ -11,11 +11,17 @@ export async function POST(req: NextRequest) {
   const {
     name, email, phone, password,
     address, postcode, propertyType, ownershipType, bedrooms,
-    subscriptionTier,
+    landlordProperties, landlordRooms,
   } = body;
 
+  const isLandlord       = ownershipType === "LANDLORD";
+  const subscriptionTier = isLandlord ? "ENTERPRISE" : (body.subscriptionTier ?? "BASIC");
+
   // ── Validation ────────────────────────────────────────────────────────────
-  if (!name || !email || !password || !address || !postcode || !subscriptionTier) {
+  if (!name || !email || !password || !address || !postcode) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+  if (!isLandlord && !body.subscriptionTier) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
   if (password.length < 8) {
@@ -44,7 +50,7 @@ export async function POST(req: NextRequest) {
       customer: {
         create: {
           subscriptionTier,
-          subscriptionStatus: "ACTIVE",
+          subscriptionStatus: isLandlord ? "PENDING" : "ACTIVE",
           visitsPerYear:     tier.visitsPerYear,
           emergencyCallouts: tier.emergencyCallouts === Infinity ? 999 : tier.emergencyCallouts,
           discountPercent:   tier.discount,
@@ -66,6 +72,11 @@ export async function POST(req: NextRequest) {
 
   const customerId = user.customer!.id;
   const baseUrl    = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+
+  // ── Landlord enquiry — no GoCardless, just confirm submission ─────────────
+  if (isLandlord) {
+    return NextResponse.json({ redirectUrl: "/login?registered=1" }, { status: 201 });
+  }
 
   // ── GoCardless billing request ────────────────────────────────────────────
   if (!isGoCardlessConfigured()) {
