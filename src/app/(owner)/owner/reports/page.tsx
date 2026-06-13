@@ -6,7 +6,7 @@ import DownloadButton from "./DownloadButton";
 import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
-  BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
+  BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
 };
 
 export default async function OwnerReportsPage() {

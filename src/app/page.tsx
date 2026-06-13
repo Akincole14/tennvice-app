@@ -64,7 +64,7 @@ const steps = [
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const tierHighlight: Record<string, boolean> = { PREMIUM: true };
+const tierHighlight: Record<string, boolean> = { PLUS: true };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -222,8 +222,14 @@ export default function HomePage() {
                     )}
                     <h3 className="text-base font-bold text-gray-900">{tier.label}</h3>
                     <div className="mt-3 mb-5">
-                      <span className="text-3xl font-bold text-brand-600">£{tier.price}</span>
-                      <span className="text-sm text-gray-400">/mo</span>
+                      {key === "ENTERPRISE" ? (
+                        <span className="text-2xl font-bold text-brand-600">Get A Quote</span>
+                      ) : (
+                        <>
+                          <span className="text-3xl font-bold text-brand-600">£{tier.price}</span>
+                          <span className="text-sm text-gray-400">/mo</span>
+                        </>
+                      )}
                     </div>
                     <ul className="space-y-2.5 flex-1 mb-6">
                       {tier.features.map(f => (
@@ -234,14 +240,14 @@ export default function HomePage() {
                       ))}
                     </ul>
                     <a
-                      href="/login"
+                      href={key === "ENTERPRISE" ? "/contact" : "/login"}
                       className={`block text-center text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors ${
                         highlighted
                           ? "bg-brand-600 text-white hover:bg-brand-700"
                           : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                     >
-                      Get started
+                      {key === "ENTERPRISE" ? "Contact us" : "Get started"}
                     </a>
                   </div>
                 );
