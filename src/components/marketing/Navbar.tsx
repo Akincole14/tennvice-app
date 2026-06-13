@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Shield, Info, PoundSterling, Wrench } from "lucide-react";
+import { Menu, X, Shield, Info, PoundSterling, Wrench, LayoutDashboard } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const links = [
   { href: "#features",     label: "Features",     icon: Shield },
@@ -11,9 +12,23 @@ const links = [
   { href: "#pricing",      label: "Pricing",       icon: PoundSterling },
 ];
 
+function dashboardHref(role?: string | null) {
+  if (role === "CUSTOMER")   return "/portal";
+  if (role === "TECHNICIAN") return "/tech";
+  if (role === "OWNER")      return "/owner/dashboard";
+  if (role === "MANAGER")    return "/manager/dashboard";
+  return "/dashboard";
+}
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
+  const { data: session, status } = useSession();
+
+  const user      = session?.user as any;
+  const loggedIn  = status === "authenticated";
+  const initial   = user?.name?.charAt(0)?.toUpperCase() ?? "?";
+  const href      = dashboardHref(user?.role);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10);
@@ -55,18 +70,35 @@ export default function Navbar() {
 
           {/* Desktop CTAs */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/register"
-              className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors"
-            >
-              Get started
-            </Link>
+            {loggedIn ? (
+              <Link
+                href={href}
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-gray-200 hover:border-brand-300 hover:bg-brand-50 transition-colors group"
+              >
+                <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  {initial}
+                </div>
+                <span className="text-sm font-semibold text-gray-700 group-hover:text-brand-700 flex items-center gap-1.5">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  Dashboard
+                </span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors"
+                >
+                  Get started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile toggle */}
@@ -138,20 +170,36 @@ export default function Navbar() {
 
           {/* CTA buttons */}
           <div className="px-6 pb-8 pt-3 space-y-3 border-t border-gray-100">
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="block text-center text-sm font-semibold text-gray-700 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/register"
-              onClick={() => setOpen(false)}
-              className="block text-center text-sm font-semibold text-white tv-gradient-warm py-3 rounded-xl hover:opacity-90 transition-opacity"
-            >
-              Get started →
-            </Link>
+            {loggedIn ? (
+              <Link
+                href={href}
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-2.5 text-sm font-semibold text-white tv-gradient-warm py-3 rounded-xl hover:opacity-90 transition-opacity"
+              >
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  {initial}
+                </div>
+                <LayoutDashboard className="w-4 h-4" />
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="block text-center text-sm font-semibold text-gray-700 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className="block text-center text-sm font-semibold text-white tv-gradient-warm py-3 rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  Get started →
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
