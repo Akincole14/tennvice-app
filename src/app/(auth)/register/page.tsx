@@ -200,9 +200,9 @@ function Step2({
       {isLandlord && (
         <div className="space-y-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-4">
           <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide">Landlord details</p>
-          <Field label="Number of properties">
+          <Field label="Number of properties" error={errors.landlordProperties}>
             <select
-              className={inputCls()}
+              className={inputCls(errors.landlordProperties)}
               value={data.landlordProperties}
               onChange={e => { set("landlordProperties", e.target.value); set("landlordRooms", ""); }}
             >
@@ -214,9 +214,9 @@ function Step2({
           </Field>
 
           {data.landlordProperties && (
-            <Field label="Rooms per property">
+            <Field label="Rooms per property" error={errors.landlordRooms}>
               <select
-                className={inputCls()}
+                className={inputCls(errors.landlordRooms)}
                 value={data.landlordRooms}
                 onChange={e => set("landlordRooms", e.target.value)}
               >
@@ -446,6 +446,10 @@ export default function RegisterPage() {
     if (step === 1) {
       if (!form.address.trim())  errs.address  = "Address is required";
       if (!form.postcode.trim()) errs.postcode = "Postcode is required";
+      if (form.ownershipType === "LANDLORD") {
+        if (!form.landlordProperties) errs.landlordProperties = "Please select number of properties";
+        else if (!form.landlordRooms) errs.landlordRooms = "Please select rooms per property";
+      }
     }
 
     setErrors(errs);
