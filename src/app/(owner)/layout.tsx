@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import OwnerSidebar from "@/components/layout/OwnerSidebar";
+import MobileOwnerNav from "@/components/layout/MobileOwnerNav";
 
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -19,7 +20,8 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-screen">
       <OwnerSidebar name={user.name ?? "Owner"} photo={dbUser?.image ?? null} />
-      <main className="flex-1 bg-gray-50 pt-4 px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
+      <MobileOwnerNav name={user.name ?? "Owner"} photo={dbUser?.image ?? null} />
+      <main className="flex-1 bg-gray-50 pt-[116px] px-4 pb-6 md:pt-0 md:px-0 md:pb-0 md:p-8">
         {children}
       </main>
     </div>

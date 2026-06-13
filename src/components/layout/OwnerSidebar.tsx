@@ -83,7 +83,7 @@ export default function OwnerSidebar({
             )}
           >
             <Settings className="w-4 h-4" />
-            Account
+            Account settings
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
