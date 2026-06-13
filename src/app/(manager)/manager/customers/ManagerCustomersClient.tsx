@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Trash2, Loader2 } from "lucide-react";
+import { TIER_LABELS } from "@/lib/utils";
 
 const tierColors: Record<string, string> = {
   BASIC:      "bg-gray-100 text-gray-700",
@@ -86,7 +87,7 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
           >
             <option value="ALL">All tiers</option>
             {["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"].map(t => (
-              <option key={t} value={t}>{t.charAt(0) + t.slice(1).toLowerCase()}</option>
+              <option key={t} value={t}>{TIER_LABELS[t] ?? t}</option>
             ))}
           </select>
           <select
@@ -121,7 +122,7 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[c.subscriptionTier]}`}>
-                    {c.subscriptionTier.charAt(0) + c.subscriptionTier.slice(1).toLowerCase()} — £{TIER_PRICES[c.subscriptionTier]}/mo
+                    {TIER_LABELS[c.subscriptionTier] ?? c.subscriptionTier} — £{TIER_PRICES[c.subscriptionTier]}/mo
                   </span>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[c.subscriptionStatus]}`}>
                     {c.subscriptionStatus.charAt(0) + c.subscriptionStatus.slice(1).toLowerCase()}
@@ -174,7 +175,7 @@ export default function ManagerCustomersClient({ customers: initial }: { custome
                   </td>
                   <td className="px-5 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[c.subscriptionTier]}`}>
-                      {c.subscriptionTier.charAt(0) + c.subscriptionTier.slice(1).toLowerCase()} — £{TIER_PRICES[c.subscriptionTier]}/mo
+                      {TIER_LABELS[c.subscriptionTier] ?? c.subscriptionTier} — £{TIER_PRICES[c.subscriptionTier]}/mo
                     </span>
                   </td>
                   <td className="px-5 py-3">

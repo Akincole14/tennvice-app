@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, FileText } from "lucide-react";
+import { TIER_LABELS } from "@/lib/utils";
 
 const tierColors: Record<string, string> = {
   BASIC:      "bg-gray-100 text-gray-700",
@@ -85,7 +86,7 @@ export default function PropertiesClient({ properties }: { properties: Property[
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[p.customer.subscriptionTier]}`}>
-                    {p.customer.subscriptionTier.charAt(0) + p.customer.subscriptionTier.slice(1).toLowerCase()}
+                    {TIER_LABELS[p.customer.subscriptionTier] ?? p.customer.subscriptionTier}
                   </span>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.ownershipType === "TENANT" ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
                     {p.ownershipType === "TENANT" ? "Tenant" : "Owner"}
@@ -158,7 +159,7 @@ export default function PropertiesClient({ properties }: { properties: Property[
                     <td className="px-5 py-3 text-gray-700">{p.customer.user.name ?? "—"}</td>
                     <td className="px-5 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tierColors[p.customer.subscriptionTier]}`}>
-                        {p.customer.subscriptionTier.charAt(0) + p.customer.subscriptionTier.slice(1).toLowerCase()}
+                        {TIER_LABELS[p.customer.subscriptionTier] ?? p.customer.subscriptionTier}
                       </span>
                     </td>
                     <td className="px-5 py-3">

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { BarChart3 } from "lucide-react";
 import DownloadButton from "./DownloadButton";
 import OwnerSignOutButton from "@/components/OwnerSignOutButton";
+import { TIER_LABELS } from "@/lib/utils";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -83,7 +84,7 @@ export default async function OwnerReportsPage() {
                 return (
                   <tr key={tier} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-3 font-medium text-gray-900">
-                      {tier.charAt(0) + tier.slice(1).toLowerCase()}
+                      {TIER_LABELS[tier] ?? tier}
                     </td>
                     <td className="px-6 py-3 text-gray-600">£{price}/mo</td>
                     <td className="px-6 py-3 text-gray-700">{count}</td>

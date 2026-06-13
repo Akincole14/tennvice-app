@@ -5,6 +5,7 @@ import { ArrowLeft, Home, User, Wrench, AlertTriangle, Eye } from "lucide-react"
 import VisitStatusControls from "./VisitStatusControls";
 import VisitActions from "./VisitActions";
 import SignOutButton from "@/components/SignOutButton";
+import { TIER_LABELS } from "@/lib/utils";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine — Plumbing",
@@ -149,7 +150,7 @@ export default async function VisitDetailPage({ params }: { params: Promise<{ id
           <p className="text-sm text-gray-500">{customer.user.email}</p>
           {customer.user.phone && <p className="text-sm text-gray-500">{customer.user.phone}</p>}
           <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${tierColors[customer.subscriptionTier]}`}>
-            {customer.subscriptionTier.charAt(0) + customer.subscriptionTier.slice(1).toLowerCase()}
+            {TIER_LABELS[customer.subscriptionTier] ?? customer.subscriptionTier}
           </span>
         </div>
 

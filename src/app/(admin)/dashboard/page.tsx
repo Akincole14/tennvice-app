@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SignOutButton from "@/components/SignOutButton";
+import { TIER_LABELS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -390,7 +391,7 @@ export default async function DashboardPage() {
                   <div key={tier}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm text-gray-700 font-medium">
-                        {tier.charAt(0) + tier.slice(1).toLowerCase()}
+                        {TIER_LABELS[tier] ?? tier}
                       </span>
                       <span className="text-sm text-gray-500">{count}{isSenior ? ` · £${TIER_PRICES[tier]}/mo` : ""}</span>
                     </div>

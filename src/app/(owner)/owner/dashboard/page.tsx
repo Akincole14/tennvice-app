@@ -8,6 +8,7 @@ import {
   TrendingUp, CheckCircle,
 } from "lucide-react";
 import OwnerSignOutButton from "@/components/OwnerSignOutButton";
+import { TIER_LABELS } from "@/lib/utils";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -168,7 +169,7 @@ export default async function OwnerDashboardPage() {
                 <div key={tier}>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-gray-700 font-medium">
-                      {tier.charAt(0) + tier.slice(1).toLowerCase()}
+                      {TIER_LABELS[tier] ?? tier}
                     </span>
                     <span className="text-sm text-gray-500">{count} · £{TIER_PRICES[tier]}/mo</span>
                   </div>

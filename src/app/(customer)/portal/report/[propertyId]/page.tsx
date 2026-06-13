@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import PrintButton from "./PrintButton";
+import { TIER_LABELS } from "@/lib/utils";
 import SignOutButton from "@/components/SignOutButton";
 
 const typeLabels: Record<string, string> = {
@@ -122,7 +123,7 @@ export default async function ServiceReportPage({ params }: { params: Promise<{ 
             <p className="text-sm text-gray-600">{customer.user.email}</p>
             {customer.user.phone && <p className="text-sm text-gray-600">{customer.user.phone}</p>}
             <p className="text-sm text-gray-500 mt-1">
-              {customer.subscriptionTier.charAt(0) + customer.subscriptionTier.slice(1).toLowerCase()} plan ·{" "}
+              {TIER_LABELS[customer.subscriptionTier] ?? customer.subscriptionTier} plan ·{" "}
               <span className={customer.subscriptionStatus === "ACTIVE" ? "text-green-600" : "text-red-500"}>
                 {customer.subscriptionStatus.charAt(0) + customer.subscriptionStatus.slice(1).toLowerCase()}
               </span>

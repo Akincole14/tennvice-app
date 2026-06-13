@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { TIER_LABELS } from "@/lib/utils";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     ...customers.map(c => [
       c.user.name ?? "",
       c.user.email ?? "",
-      c.subscriptionTier.charAt(0) + c.subscriptionTier.slice(1).toLowerCase(),
+      TIER_LABELS[c.subscriptionTier] ?? c.subscriptionTier,
       String(TIER_PRICES[c.subscriptionTier] ?? 0),
       c.subscriptionStatus,
       new Date(c.user.createdAt).toLocaleDateString("en-GB"),

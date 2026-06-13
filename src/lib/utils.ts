@@ -5,6 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const TIER_LABELS: Record<string, string> = {
+  BASIC:      "Standard",
+  STANDARD:   "Plus",
+  PLUS:       "Premium",
+  PREMIUM:    "10-Plus",
+  ENTERPRISE: "Landlords",
+};
+
 export const SUBSCRIPTION_TIERS = {
   BASIC: {
     label: "Standard",
