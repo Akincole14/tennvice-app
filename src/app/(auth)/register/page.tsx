@@ -180,28 +180,24 @@ function Step2({
   set: (k: keyof FormData, v: string) => void;
   errors: Partial<Record<keyof FormData, string>>;
 }) {
+  const isLandlord = data.ownershipType === "LANDLORD";
+
   return (
     <div className="space-y-4">
-      <Field label="Property address" error={errors.address}>
-        <input className={inputCls(errors.address)} value={data.address} onChange={e => set("address", e.target.value)} placeholder="12 Acacia Avenue, London" />
-      </Field>
-      <Field label="Postcode" error={errors.postcode}>
-        <input className={cn(inputCls(errors.postcode), "uppercase")} value={data.postcode} onChange={e => set("postcode", e.target.value.toUpperCase())} placeholder="SW1A 1AA" />
-      </Field>
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Property type">
-          <select className={inputCls()} value={data.propertyType} onChange={e => set("propertyType", e.target.value)}>
-            {PROPERTY_TYPES.map(t => <option key={t}>{t}</option>)}
-          </select>
-        </Field>
         <Field label="Ownership">
           <select className={inputCls()} value={data.ownershipType} onChange={e => set("ownershipType", e.target.value)}>
             {OWNERSHIP_TYPES.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </Field>
+        <Field label="Property type">
+          <select className={inputCls()} value={data.propertyType} onChange={e => set("propertyType", e.target.value)}>
+            {PROPERTY_TYPES.map(t => <option key={t}>{t}</option>)}
+          </select>
+        </Field>
       </div>
 
-      {data.ownershipType === "LANDLORD" && (
+      {isLandlord && (
         <div className="space-y-4 rounded-2xl border border-brand-200 bg-brand-50/50 p-4">
           <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide">Landlord details</p>
           <Field label="Number of properties">
@@ -235,12 +231,21 @@ function Step2({
         </div>
       )}
 
-      <Field label="Bedrooms (optional)">
-        <select className={inputCls()} value={data.bedrooms} onChange={e => set("bedrooms", e.target.value)}>
-          <option value="">Select…</option>
-          {["1","2","3","4","5"].map(n => <option key={n} value={n}>{n}{n === "5" ? "+" : ""}</option>)}
-        </select>
+      <Field label="Property address" error={errors.address}>
+        <input className={inputCls(errors.address)} value={data.address} onChange={e => set("address", e.target.value)} placeholder="12 Acacia Avenue, London" />
       </Field>
+      <Field label="Postcode" error={errors.postcode}>
+        <input className={cn(inputCls(errors.postcode), "uppercase")} value={data.postcode} onChange={e => set("postcode", e.target.value.toUpperCase())} placeholder="SW1A 1AA" />
+      </Field>
+
+      {!isLandlord && (
+        <Field label="Bedrooms (optional)">
+          <select className={inputCls()} value={data.bedrooms} onChange={e => set("bedrooms", e.target.value)}>
+            <option value="">Select…</option>
+            {["1","2","3","4","5"].map(n => <option key={n} value={n}>{n}{n === "5" ? "+" : ""}</option>)}
+          </select>
+        </Field>
+      )}
     </div>
   );
 }
