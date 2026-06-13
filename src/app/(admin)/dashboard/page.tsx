@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar, AlertCircle, PoundSterling,
   Clock, Zap, ClipboardList, TrendingUp, CheckCircle,
-  Award, Activity, Wrench, ChevronRight,
+  Award, Activity, Wrench, ChevronRight, Building2,
 } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
@@ -76,6 +76,7 @@ async function getDashboardData() {
     pendingCertificates,
     recentVisits,
     recentCustomers,
+    pendingEnquiries,
   ] = await Promise.all([
     prisma.customer.findMany({
       where: { subscriptionStatus: "ACTIVE" },
@@ -150,6 +151,11 @@ async function getDashboardData() {
       orderBy: { createdAt: "desc" },
       take: 4,
     }),
+    prisma.customer.findMany({
+      where: { subscriptionStatus: "PENDING" },
+      include: { user: { select: { name: true, email: true, phone: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const mrr = activeCustomers.reduce((sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0), 0);
@@ -176,6 +182,7 @@ async function getDashboardData() {
     pendingCertificates,
     recentVisits,
     recentCustomers,
+    pendingEnquiries,
   };
 }
 
@@ -254,6 +261,52 @@ export default async function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* Pending landlord enquiries */}
+      {d.pendingEnquiries.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden">
+          <div className="px-6 py-4 border-b border-amber-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
+              <h2 className="font-semibold text-amber-900">Pending Enquiries</h2>
+              <span className="text-xs font-semibold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                {d.pendingEnquiries.length}
+              </span>
+            </div>
+            <Link href="/customers" className="text-xs text-amber-700 hover:underline font-medium">View all customers</Link>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {d.pendingEnquiries.map(c => (
+              <Link
+                key={c.id}
+                href={`/customers/${c.id}`}
+                className="flex items-center justify-between px-6 py-4 hover:bg-amber-100/60 transition-colors group"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 group-hover:text-brand-600">
+                    {c.user.name ?? "—"}
+                  </p>
+                  <p className="text-sm text-gray-500">{c.user.email}</p>
+                  {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
+                </div>
+                <div className="text-right shrink-0 ml-6 space-y-0.5">
+                  {c.landlordProperties ? (
+                    <>
+                      <p className="text-sm font-semibold text-amber-800">{c.landlordProperties} properties</p>
+                      {c.landlordRooms && <p className="text-xs text-amber-700">{c.landlordRooms} rooms each</p>}
+                    </>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No details submitted</p>
+                  )}
+                  <p className="text-xs text-gray-400">
+                    {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Today's schedule */}
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -516,7 +569,17 @@ export default async function DashboardPage() {
       {/* Needs attention */}
       <div className="hidden md:block">
         <h2 className="font-semibold text-gray-900 mb-4">Needs attention</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          <AttentionPanel title="Pending enquiries" count={d.pendingEnquiries.length} emptyText="No landlord enquiries pending." href="/customers" badgeStyle="bg-amber-50 text-amber-700">
+            {d.pendingEnquiries.slice(0, 5).map(c => (
+              <AttentionRow key={c.id} href={`/customers/${c.id}`}
+                primary={c.user.name ?? "—"}
+                secondary={c.landlordProperties ? `${c.landlordProperties} props · ${c.landlordRooms ?? "rooms TBC"}` : c.user.email ?? "—"}
+                badge="Pending" badgeStyle="bg-blue-50 text-blue-700"
+              />
+            ))}
+          </AttentionPanel>
+
           <AttentionPanel title="Unassigned visits" count={d.unassignedVisits.length} emptyText="All visits have a technician." href="/visits">
             {d.unassignedVisits.map(v => (
               <AttentionRow key={v.id} href={`/visits/${v.id}`}
@@ -573,8 +636,8 @@ function timeAgo(date: Date): string {
   return `${Math.floor(secs / 86400)}d ago`;
 }
 
-function AttentionPanel({ title, count, emptyText, href, children }: {
-  title: string; count: number; emptyText: string; href: string; children: React.ReactNode;
+function AttentionPanel({ title, count, emptyText, href, badgeStyle, children }: {
+  title: string; count: number; emptyText: string; href: string; badgeStyle?: string; children: React.ReactNode;
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -582,7 +645,7 @@ function AttentionPanel({ title, count, emptyText, href, children }: {
         <h3 className="font-medium text-gray-900 text-sm">{title}</h3>
         <div className="flex items-center gap-2">
           {count > 0 && (
-            <span className="text-xs font-semibold bg-red-50 text-red-600 px-2 py-0.5 rounded-full">{count}</span>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeStyle ?? "bg-red-50 text-red-600"}`}>{count}</span>
           )}
           <Link href={href} className="text-xs text-brand-600 hover:underline font-medium">View all</Link>
         </div>
