@@ -25,10 +25,16 @@ export default function Navbar() {
   const [open, setOpen]         = useState(false);
   const { data: session, status } = useSession();
 
-  const user      = session?.user as any;
-  const loggedIn  = status === "authenticated";
-  const initial   = user?.name?.charAt(0)?.toUpperCase() ?? "?";
-  const href      = dashboardHref(user?.role);
+  const user     = session?.user as any;
+  const loggedIn = status === "authenticated";
+  const href     = dashboardHref(user?.role);
+
+  const initials = (() => {
+    const parts = (user?.name ?? "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "?";
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  })();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10);
@@ -76,7 +82,7 @@ export default function Navbar() {
                 className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-gray-200 hover:border-brand-300 hover:bg-brand-50 transition-colors group"
               >
                 <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                  {initial}
+                  {initials}
                 </div>
                 <span className="text-sm font-semibold text-gray-700 group-hover:text-brand-700 flex items-center gap-1.5">
                   <LayoutDashboard className="w-3.5 h-3.5" />
@@ -177,7 +183,7 @@ export default function Navbar() {
                 className="flex items-center justify-center gap-2.5 text-sm font-semibold text-white tv-gradient-warm py-3 rounded-xl hover:opacity-90 transition-opacity"
               >
                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                  {initial}
+                  {initials}
                 </div>
                 <LayoutDashboard className="w-4 h-4" />
                 Go to Dashboard
