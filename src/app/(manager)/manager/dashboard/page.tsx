@@ -7,6 +7,7 @@ import {
   PoundSterling, Clock, Zap,
   TrendingUp, CheckCircle,
 } from "lucide-react";
+import ManagerSignOutButton from "@/components/ManagerSignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -116,15 +117,18 @@ export default async function ManagerDashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
         </div>
-        {d.newCustomersThisMonth > 0 && (
-          <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
-            <TrendingUp className="w-4 h-4" />
-            <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
-            {customerGrowth !== null && (
-              <span className="text-xs text-green-500">({customerGrowth >= 0 ? "+" : ""}{customerGrowth}% vs last month)</span>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {d.newCustomersThisMonth > 0 && (
+            <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
+              <TrendingUp className="w-4 h-4" />
+              <span className="font-medium">{d.newCustomersThisMonth} new customer{d.newCustomersThisMonth > 1 ? "s" : ""} this month</span>
+              {customerGrowth !== null && (
+                <span className="text-xs text-green-500">({customerGrowth >= 0 ? "+" : ""}{customerGrowth}% vs last month)</span>
+              )}
+            </div>
+          )}
+          <ManagerSignOutButton />
+        </div>
       </div>
 
       {/* Stat cards */}

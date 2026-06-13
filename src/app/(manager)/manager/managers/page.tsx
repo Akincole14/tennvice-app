@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Star } from "lucide-react";
+import ManagerSignOutButton from "@/components/ManagerSignOutButton";
 
 export default async function ManagerManagersPage() {
   const session = await getServerSession(authOptions);
@@ -15,12 +16,15 @@ export default async function ManagerManagersPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4 md:py-8">
-      <div className="flex items-center gap-2">
-        <Star className="w-6 h-6 text-purple-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manager accounts</h1>
-          <p className="text-sm text-gray-500">View all manager-level users.</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Star className="w-6 h-6 text-purple-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Manager accounts</h1>
+            <p className="text-sm text-gray-500">View all manager-level users.</p>
+          </div>
         </div>
+        <ManagerSignOutButton />
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BarChart3 } from "lucide-react";
+import ManagerSignOutButton from "@/components/ManagerSignOutButton";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 15, STANDARD: 22, PLUS: 27, PREMIUM: 50, ENTERPRISE: 75,
@@ -29,12 +30,15 @@ export default async function ManagerReportsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-4 md:py-8">
-      <div className="flex items-center gap-2">
-        <BarChart3 className="w-6 h-6 text-brand-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Financial Reports</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Revenue and subscription breakdown</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-6 h-6 text-brand-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Financial Reports</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Revenue and subscription breakdown</p>
+          </div>
         </div>
+        <ManagerSignOutButton />
       </div>
 
       {/* Revenue summary */}
