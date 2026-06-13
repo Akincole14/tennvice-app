@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar,
   PoundSterling, Clock, Zap,
-  TrendingUp, CheckCircle,
+  TrendingUp, CheckCircle, Building2, Mail,
 } from "lucide-react";
 import ManagerSignOutButton from "@/components/ManagerSignOutButton";
 import { TIER_LABELS } from "@/lib/utils";
@@ -13,6 +13,36 @@ import { TIER_LABELS } from "@/lib/utils";
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
 };
+
+function buildMailto(email: string, name: string, props: string | null, rooms: string | null): string {
+  const subject = `Tennvice Landlord Quote – ${name}`;
+  const body = [
+    `Dear ${name},`,
+    ``,
+    `Thank you for your interest in Tennvice. We have received your landlord enquiry and are pleased to follow up with a tailored quote.`,
+    ``,
+    `Enquiry details on file:`,
+    `• Number of properties: ${props ?? "—"}`,
+    `• Rooms per property: ${rooms ?? "—"}`,
+    ``,
+    `[YOUR QUOTE DETAILS AND PRICING HERE]`,
+    ``,
+    `Our Landlords plan includes:`,
+    `• 12 scheduled visits per year`,
+    `• 20% discount on parts & labour (after 6 months)`,
+    `• Unlimited emergency call-outs`,
+    `• Dedicated account manager`,
+    ``,
+    `If you have any questions or would like to discuss further, please don't hesitate to reply to this email.`,
+    ``,
+    `Kind regards,`,
+    `[YOUR NAME]`,
+    `Tennvice`,
+    `home@tennvice.com`,
+    `tennvice.com`,
+  ].join("\n");
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 async function getDashboardData() {
   const now        = new Date();
@@ -37,6 +67,7 @@ async function getDashboardData() {
     unassignedVisits,
     emergencyVisits,
     tierBreakdown,
+    pendingEnquiries,
   ] = await Promise.all([
     prisma.customer.findMany({
       where:  { subscriptionStatus: "ACTIVE" },
@@ -58,6 +89,11 @@ async function getDashboardData() {
       where: { subscriptionStatus: "ACTIVE" },
       _count: true,
     }),
+    prisma.customer.findMany({
+      where:   { subscriptionStatus: "PENDING" },
+      include: { user: { select: { name: true, email: true, phone: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const mrr        = activeCustomers.reduce((sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0), 0);
@@ -76,6 +112,7 @@ async function getDashboardData() {
     unassignedVisits,
     emergencyVisits,
     tierBreakdown,
+    pendingEnquiries,
   };
 }
 
@@ -150,6 +187,53 @@ export default async function ManagerDashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* Pending landlord enquiries */}
+      {d.pendingEnquiries.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden">
+          <div className="px-6 py-4 border-b border-amber-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
+              <h2 className="font-semibold text-amber-900">Pending Enquiries</h2>
+              <span className="text-xs font-semibold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                {d.pendingEnquiries.length}
+              </span>
+            </div>
+            <Link href="/manager/customers" className="text-xs text-amber-700 hover:underline font-medium">View all customers</Link>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {d.pendingEnquiries.map(c => (
+              <div key={c.id} className="flex items-center gap-4 px-6 py-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900">{c.user.name ?? "—"}</p>
+                  <p className="text-sm text-gray-500">{c.user.email}</p>
+                  {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
+                </div>
+                <div className="text-right shrink-0 space-y-0.5">
+                  {c.landlordProperties ? (
+                    <>
+                      <p className="text-sm font-semibold text-amber-800">{c.landlordProperties} properties</p>
+                      {c.landlordRooms && <p className="text-xs text-amber-700">{c.landlordRooms} rooms each</p>}
+                    </>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No details submitted</p>
+                  )}
+                  <p className="text-xs text-gray-400">
+                    {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+                <a
+                  href={buildMailto(c.user.email ?? "", c.user.name ?? "Customer", c.landlordProperties, c.landlordRooms)}
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Send quote
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Subscriptions tier panel */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 max-w-sm">
