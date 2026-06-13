@@ -38,8 +38,9 @@ export default function LoginPage() {
     const role    = session?.user?.role;
 
     router.push(
-      role === "CUSTOMER"   ? "/portal" :
-      role === "TECHNICIAN" ? "/tech"   :
+      role === "CUSTOMER"   ? "/portal"          :
+      role === "TECHNICIAN" ? "/tech"             :
+      role === "OWNER"      ? "/owner/dashboard"  :
       "/dashboard"
     );
   }
