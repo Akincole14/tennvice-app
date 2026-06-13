@@ -36,7 +36,7 @@ export default function MobileOwnerNav({ name, photo }: { name: string; photo?: 
     <>
       {/* Top header */}
       <header className="md:hidden fixed top-0 inset-x-0 z-40 bg-white border-b border-gray-100 h-14 flex items-center px-4 justify-between">
-        <span className="text-3xl font-bold text-brand-700">Tennvice</span>
+        <Link href="/" className="text-3xl font-bold text-brand-700 hover:opacity-80 transition-opacity">Tennvice</Link>
         <button
           onClick={() => setOpen(true)}
           className="w-8 h-8 rounded-full overflow-hidden shrink-0 ring-2 ring-amber-100"
