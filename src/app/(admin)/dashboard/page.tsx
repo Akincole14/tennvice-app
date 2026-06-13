@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar, AlertCircle, PoundSterling,
   Clock, Zap, ClipboardList, TrendingUp, CheckCircle,
-  Award, Activity, Wrench, ChevronRight, Building2,
+  Award, Activity, Wrench, ChevronRight, Building2, Mail,
 } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
@@ -36,6 +36,36 @@ const statusColors: Record<string, string> = {
   COMPLETED:   "bg-green-100 text-green-700",
   CANCELLED:   "bg-red-100 text-red-700",
 };
+
+function buildMailto(email: string, name: string, props: string | null, rooms: string | null): string {
+  const subject = `Tennvice Landlord Quote – ${name}`;
+  const body = [
+    `Dear ${name},`,
+    ``,
+    `Thank you for your interest in Tennvice. We have received your landlord enquiry and are pleased to follow up with a tailored quote.`,
+    ``,
+    `Enquiry details on file:`,
+    `• Number of properties: ${props ?? "—"}`,
+    `• Rooms per property: ${rooms ?? "—"}`,
+    ``,
+    `[YOUR QUOTE DETAILS AND PRICING HERE]`,
+    ``,
+    `Our Landlords plan includes:`,
+    `• 12 scheduled visits per year`,
+    `• 20% discount on parts & labour (after 6 months)`,
+    `• Unlimited emergency call-outs`,
+    `• Dedicated account manager`,
+    ``,
+    `If you have any questions or would like to discuss further, please don't hesitate to reply to this email.`,
+    ``,
+    `Kind regards,`,
+    `[YOUR NAME]`,
+    `Tennvice`,
+    `home@tennvice.com`,
+    `tennvice.com`,
+  ].join("\n");
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 async function getDashboardData() {
   const now       = new Date();
@@ -277,19 +307,15 @@ export default async function DashboardPage() {
           </div>
           <div className="divide-y divide-amber-100">
             {d.pendingEnquiries.map(c => (
-              <Link
-                key={c.id}
-                href={`/customers/${c.id}`}
-                className="flex items-center justify-between px-6 py-4 hover:bg-amber-100/60 transition-colors group"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-900 group-hover:text-brand-600">
+              <div key={c.id} className="flex items-center gap-4 px-6 py-4">
+                <div className="flex-1 min-w-0">
+                  <Link href={`/customers/${c.id}`} className="font-medium text-gray-900 hover:text-brand-600 transition-colors">
                     {c.user.name ?? "—"}
-                  </p>
+                  </Link>
                   <p className="text-sm text-gray-500">{c.user.email}</p>
                   {c.user.phone && <p className="text-xs text-gray-400">{c.user.phone}</p>}
                 </div>
-                <div className="text-right shrink-0 ml-6 space-y-0.5">
+                <div className="text-right shrink-0 space-y-0.5">
                   {c.landlordProperties ? (
                     <>
                       <p className="text-sm font-semibold text-amber-800">{c.landlordProperties} properties</p>
@@ -302,7 +328,14 @@ export default async function DashboardPage() {
                     {new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
-              </Link>
+                <a
+                  href={buildMailto(c.user.email ?? "", c.user.name ?? "Customer", c.landlordProperties, c.landlordRooms)}
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Send quote
+                </a>
+              </div>
             ))}
           </div>
         </div>

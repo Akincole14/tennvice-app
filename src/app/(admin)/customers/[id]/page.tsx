@@ -1,11 +1,41 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText, Building2 } from "lucide-react";
+import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText, Building2, Mail } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+
+function buildMailto(email: string, name: string, props: string | null, rooms: string | null): string {
+  const subject = `Tennvice Landlord Quote – ${name}`;
+  const body = [
+    `Dear ${name},`,
+    ``,
+    `Thank you for your interest in Tennvice. We have received your landlord enquiry and are pleased to follow up with a tailored quote.`,
+    ``,
+    `Enquiry details on file:`,
+    `• Number of properties: ${props ?? "—"}`,
+    `• Rooms per property: ${rooms ?? "—"}`,
+    ``,
+    `[YOUR QUOTE DETAILS AND PRICING HERE]`,
+    ``,
+    `Our Landlords plan includes:`,
+    `• 12 scheduled visits per year`,
+    `• 20% discount on parts & labour (after 6 months)`,
+    `• Unlimited emergency call-outs`,
+    `• Dedicated account manager`,
+    ``,
+    `If you have any questions or would like to discuss further, please don't hesitate to reply to this email.`,
+    ``,
+    `Kind regards,`,
+    `[YOUR NAME]`,
+    `Tennvice`,
+    `home@tennvice.com`,
+    `tennvice.com`,
+  ].join("\n");
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -154,6 +184,15 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                 {new Date(customer.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </p>
             </div>
+          </div>
+          <div className="pt-1">
+            <a
+              href={buildMailto(customer.user.email ?? "", customer.user.name ?? "Customer", customer.landlordProperties, customer.landlordRooms)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-brand-600 text-white hover:bg-brand-700 transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              Send quote email
+            </a>
           </div>
         </div>
       )}
