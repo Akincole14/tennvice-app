@@ -53,7 +53,7 @@ export default function OwnerSidebar({
         </div>
       )}
 
-      <nav className="flex-1 px-3 py-4 flex flex-col">
+      <nav className="flex-1 px-3 py-4 flex flex-col overflow-y-auto">
         <div className="space-y-1">
           {ownerNav.map(({ href, label, icon: Icon }) => (
             <Link
