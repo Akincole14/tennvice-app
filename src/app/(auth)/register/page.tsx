@@ -316,7 +316,41 @@ function Step3({ data, set }: { data: FormData; set: (k: keyof FormData, v: stri
 
 // ─── Step 4 — Direct debit via GoCardless ─────────────────────────────────────
 
-function Step4({ data }: { data: FormData }) {
+function Step4({ data, isLandlord }: { data: FormData; isLandlord: boolean }) {
+  if (isLandlord) {
+    return (
+      <div className="space-y-5">
+        <div className="bg-brand-50 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-brand-600 shrink-0" />
+            <p className="text-sm font-semibold text-brand-900">Landlord enquiry</p>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            A member of our team will be in touch with you shortly to review your submission and give you your quote.
+          </p>
+          <ul className="space-y-2 pt-1">
+            {[
+              "Tailored pricing for your portfolio",
+              "Dedicated account manager",
+              "Flexible visit scheduling across all properties",
+              "Consolidated billing and reporting",
+            ].map(item => (
+              <li key={item} className="flex items-center gap-2 text-xs text-gray-600">
+                <Check className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-gray-200 p-4 space-y-1.5">
+          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Submission summary</p>
+          <p className="text-sm text-gray-600">{data.landlordProperties ? `${data.landlordProperties} propert${data.landlordProperties === "1" ? "y" : "ies"}` : ""}{data.landlordRooms ? ` · ${data.landlordRooms} rooms each` : ""}</p>
+          <p className="text-sm text-gray-600">{data.address}{data.postcode ? `, ${data.postcode}` : ""}</p>
+        </div>
+      </div>
+    );
+  }
+
   const tier = SUBSCRIPTION_TIERS[data.subscriptionTier as keyof typeof SUBSCRIPTION_TIERS];
   return (
     <div className="space-y-5">
@@ -371,11 +405,14 @@ function Step4({ data }: { data: FormData }) {
 
 export default function RegisterPage() {
   const router  = useRouter();
-  const [step,    setStep]    = useState(0);
-  const [form,    setForm]    = useState<FormData>(INITIAL);
-  const [errors,  setErrors]  = useState<Partial<Record<keyof FormData, string>>>({});
-  const [apiErr,  setApiErr]  = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [step,              setStep]              = useState(0);
+  const [form,              setForm]              = useState<FormData>(INITIAL);
+  const [errors,            setErrors]            = useState<Partial<Record<keyof FormData, string>>>({});
+  const [apiErr,            setApiErr]            = useState<string | null>(null);
+  const [loading,           setLoading]           = useState(false);
+  const [landlordSubmitted, setLandlordSubmitted] = useState(false);
+
+  const isLandlord = form.ownershipType === "LANDLORD";
 
   function set(key: keyof FormData, value: string) {
     setForm(f => ({ ...f, [key]: value }));
@@ -402,11 +439,14 @@ export default function RegisterPage() {
   }
 
   function next() {
-    if (validate()) setStep(s => s + 1);
+    if (!validate()) return;
+    if (step === 1 && isLandlord) { setStep(3); return; }
+    setStep(s => s + 1);
   }
 
   function back() {
     setErrors({});
+    if (step === 3 && isLandlord) { setStep(1); return; }
     setStep(s => s - 1);
   }
 
@@ -437,6 +477,12 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) {
         setApiErr(data.error ?? "Registration failed");
+        setLoading(false);
+        return;
+      }
+
+      if (isLandlord) {
+        setLandlordSubmitted(true);
         setLoading(false);
         return;
       }
@@ -482,60 +528,82 @@ export default function RegisterPage() {
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">{STEPS[step].label}</h2>
-
-          {step === 0 && <Step1 data={form} set={set} errors={errors} />}
-          {step === 1 && <Step2 data={form} set={set} errors={errors} />}
-          {step === 2 && <Step3 data={form} set={set} />}
-          {step === 3 && <Step4 data={form} />}
-
-          {apiErr && (
-            <div className="mt-5 flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              {apiErr}
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-            {step > 0 ? (
-              <button
-                type="button"
-                onClick={back}
-                disabled={loading}
-                className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-40"
+          {landlordSubmitted ? (
+            <div className="text-center space-y-4 py-4">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                <Check className="w-8 h-8 text-green-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Enquiry received!</h2>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
+                A member of our team will be in touch with you shortly to review your submission and give you your quote.
+              </p>
+              <Link
+                href="/"
+                className="inline-block mt-4 text-sm font-semibold text-brand-600 hover:underline"
               >
-                <ChevronLeft className="w-4 h-4" /> Back
-              </button>
-            ) : (
-              <Link href="/login" className="text-sm text-gray-500 hover:text-gray-700">
-                Already have an account?
+                Back to home
               </Link>
-            )}
+            </div>
+          ) : (
+            <>
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">{STEPS[step].label}</h2>
 
-            {step < 3 ? (
-              <button
-                type="button"
-                onClick={next}
-                className="flex items-center gap-1.5 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl transition-colors"
-              >
-                Continue <ChevronRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={submit}
-                disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 tv-gradient-warm disabled:opacity-60 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
-              >
-                {loading ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Creating account…</>
+              {step === 0 && <Step1 data={form} set={set} errors={errors} />}
+              {step === 1 && <Step2 data={form} set={set} errors={errors} />}
+              {step === 2 && <Step3 data={form} set={set} />}
+              {step === 3 && <Step4 data={form} isLandlord={isLandlord} />}
+
+              {apiErr && (
+                <div className="mt-5 flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {apiErr}
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+                {step > 0 ? (
+                  <button
+                    type="button"
+                    onClick={back}
+                    disabled={loading}
+                    className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-40"
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Back
+                  </button>
                 ) : (
-                  <>Set up Direct Debit <ArrowRight className="w-4 h-4" /></>
+                  <Link href="/login" className="text-sm text-gray-500 hover:text-gray-700">
+                    Already have an account?
+                  </Link>
                 )}
-              </button>
-            )}
-          </div>
+
+                {step < 3 ? (
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="flex items-center gap-1.5 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl transition-colors"
+                  >
+                    Continue <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={submit}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-6 py-2.5 tv-gradient-warm disabled:opacity-60 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                  >
+                    {loading ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Submitting…</>
+                    ) : isLandlord ? (
+                      <>Submit enquiry <ArrowRight className="w-4 h-4" /></>
+                    ) : (
+                      <>Set up Direct Debit <ArrowRight className="w-4 h-4" /></>
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
