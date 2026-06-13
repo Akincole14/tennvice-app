@@ -86,14 +86,14 @@ export default async function ManagerDashboardPage() {
   const dateStr = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
   const statCards = [
-    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,    icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/manager/customers" },
-    { label: "Active customers",     value: d.activeCount,                    icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/manager/customers" },
-    { label: "Visits this week",     value: d.visitsThisWeek,                 icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/manager/dashboard" },
-    { label: "Unassigned visits",    value: d.unassignedVisits.length,        icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/manager/dashboard" },
-    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,     icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/manager/reports"   },
-    { label: "Properties",           value: d.propertyCount,                  icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/manager/dashboard" },
-    { label: "Completed this month", value: d.completedThisMonth,             icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/manager/dashboard" },
-    { label: "Emergency visits",     value: d.emergencyVisits,                icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/manager/dashboard" },
+    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,    icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/manager/reports"      },
+    { label: "Active customers",     value: d.activeCount,                    icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/manager/customers"    },
+    { label: "Visits this week",     value: d.visitsThisWeek,                 icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/manager/visit-reports"},
+    { label: "Unassigned visits",    value: d.unassignedVisits.length,        icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/manager/visit-reports"},
+    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,     icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/manager/reports"      },
+    { label: "Properties",           value: d.propertyCount,                  icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/manager/customers"    },
+    { label: "Completed this month", value: d.completedThisMonth,             icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/manager/visit-reports"},
+    { label: "Emergency visits",     value: d.emergencyVisits,                icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/manager/visit-reports"},
   ];
 
   const tierOrder     = ["BASIC", "STANDARD", "PLUS", "PREMIUM", "ENTERPRISE"];

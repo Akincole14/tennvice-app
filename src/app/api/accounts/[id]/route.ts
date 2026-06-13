@@ -7,7 +7,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const session = await getServerSession(authOptions);
   const actor   = session?.user as any;
 
-  if (!session || actor?.role !== "OWNER") {
+  const isOwner   = actor?.role === "OWNER";
+  const isManager = actor?.role === "MANAGER";
+
+  if (!session || (!isOwner && !isManager)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -21,7 +24,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!target) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   if (target.role === "OWNER") {
-    return NextResponse.json({ error: "Cannot delete another Owner account" }, { status: 403 });
+    return NextResponse.json({ error: "Cannot delete an Owner account" }, { status: 403 });
+  }
+
+  // Managers cannot delete other manager accounts
+  if (isManager && target.role === "MANAGER") {
+    return NextResponse.json({ error: "Managers cannot delete other manager accounts" }, { status: 403 });
   }
 
   // Nullify visits assigned to this technician before deleting

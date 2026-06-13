@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Wrench, ShieldCheck, BarChart3, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Wrench, ShieldCheck, Star, BarChart3, ClipboardList, Settings, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const managerNav = [
-  { href: "/manager/dashboard",   label: "Dashboard",          icon: LayoutDashboard },
-  { href: "/manager/customers",   label: "Customers",          icon: Users },
-  { href: "/manager/technicians", label: "Technicians",        icon: Wrench },
-  { href: "/manager/admins",      label: "Admins",             icon: ShieldCheck },
-  { href: "/manager/reports",     label: "Financial Reports",  icon: BarChart3 },
+  { href: "/manager/dashboard",     label: "Dashboard",          icon: LayoutDashboard },
+  { href: "/manager/customers",     label: "Customers",          icon: Users },
+  { href: "/manager/technicians",   label: "Technicians",        icon: Wrench },
+  { href: "/manager/admins",        label: "Admins",             icon: ShieldCheck },
+  { href: "/manager/managers",      label: "Managers",           icon: Star },
+  { href: "/manager/reports",       label: "Financial Reports",  icon: BarChart3 },
+  { href: "/manager/visit-reports", label: "Visit Reports",      icon: ClipboardList },
 ];
 
 export default function ManagerSidebar({
