@@ -11,6 +11,11 @@ export default function Footer() {
             <p className="mt-3 text-sm leading-relaxed max-w-xs">
               Subscription-based home maintenance giving every home a full service history — just like your car.
             </p>
+            <div className="mt-5 space-y-2 text-sm">
+              <p><span className="text-white">📞</span> <a href="tel:07300786808" className="hover:text-white transition-colors">07300786808</a></p>
+              <p><span className="text-white">✉️</span> <a href="mailto:info@tennvice.com" className="hover:text-white transition-colors">info@tennvice.com</a></p>
+              <p><span className="text-white">🌐</span> <a href="https://tennvice.com" className="hover:text-white transition-colors">tennvice.com</a></p>
+            </div>
           </div>
 
           {/* Product */}

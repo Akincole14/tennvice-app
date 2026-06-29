@@ -46,21 +46,23 @@ async function main() {
 
   const tech1 = await prisma.technician.upsert({
     where: { userId: tech1User.id },
-    update: {},
+    update: { address: "45 Stockwell Road, London, SW9 0JD" },
     create: {
       userId: tech1User.id,
       qualification: "City & Guilds Level 3 Plumbing & Heating",
       licenceNumber: "GAS-2041-DC",
+      address: "45 Stockwell Road, London, SW9 0JD",
     },
   });
 
   const tech2 = await prisma.technician.upsert({
     where: { userId: tech2User.id },
-    update: {},
+    update: { address: "18 Mile End Road, London, E1 4TU" },
     create: {
       userId: tech2User.id,
       qualification: "NVQ Level 3 Electrical Installation",
       licenceNumber: "EIC-1893-PS",
+      address: "18 Mile End Road, London, E1 4TU",
     },
   });
 

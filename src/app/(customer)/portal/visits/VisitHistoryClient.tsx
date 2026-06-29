@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
+import RescheduleButton from "@/components/portal/RescheduleButton";
 
 const statusColors: Record<string, string> = {
   SCHEDULED:   "bg-blue-100 text-blue-700",
@@ -199,6 +200,21 @@ export default function VisitHistoryClient({ visits }: { visits: Visit[] }) {
                       </p>
                     )}
                   </div>
+                </div>
+              )}
+
+              {v.status === "SCHEDULED" && (
+                <div
+                  className="px-5 pb-4 pt-3 border-t border-gray-100 flex items-center justify-between"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <RescheduleButton
+                    visitId={v.id}
+                    scheduledAt={new Date(v.scheduledAt).toISOString()}
+                    technicianName={v.technician?.user.name ?? null}
+                    propertyAddress={v.property.address}
+                  />
+                  <span className="text-xs text-gray-400">Tap card to view details</span>
                 </div>
               )}
             </Link>

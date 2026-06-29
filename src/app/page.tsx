@@ -48,23 +48,23 @@ const steps = [
   {
     number: "01",
     title: "Choose your plan",
-    body: "Pick the cover that suits your home — from a basic annual check to full emergency cover with unlimited call-outs.",
+    body: "Select the subscription that suits your home and budget — from £20 to £50 per month. No long contracts. Cancel any time.",
   },
   {
     number: "02",
-    title: "We schedule your visits",
-    body: "We match you with a local, certified technician and book visits at times that work for you.",
+    title: "Meet your dedicated technician",
+    body: "We assign one qualified technician to your home. They contact you to introduce themselves and book your first visit at a time that suits you.",
   },
   {
     number: "03",
-    title: "Receive your report",
-    body: "After every visit you get a signed inspection report with check results, recommendations, and your running service history.",
+    title: "Get your digital report",
+    body: "Within 24 hours you receive a signed digital report — your first logbook entry. Everything checked, anything flagged, clearly laid out.",
   },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const tierHighlight: Record<string, boolean> = { PLUS: true };
+const tierHighlight: Record<string, boolean> = { STANDARD: true };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -91,18 +91,21 @@ export default function HomePage() {
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-5 sm:mb-6">
-              Protect Your Home &
+              Your home deserves
               <br />
               <span
                 className="bg-clip-text text-transparent"
                 style={{ backgroundImage: "linear-gradient(135deg, #F5A820 0%, #E86515 50%, #C0145C 100%)" }}
               >
-                Have Some Peace Of Mind!
+                a service too.
               </span>
             </h1>
 
-            <p className="text-base sm:text-xl text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-              We are guaranteed to provide you the best home utility maintenance service, to put yours and your family's minds at rest!<br />Certified technicians for regular plumbing, electrical and boiler checks — giving your home a verifiable service record!
+            <p className="text-base sm:text-xl text-gray-500 max-w-2xl mx-auto mb-3 sm:mb-4 leading-relaxed font-semibold text-gray-700">
+              One subscription. One technician. Zero surprises.
+            </p>
+            <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+              Regular health checks from a dedicated technician. A verified digital service history. Peace of mind — for one simple monthly subscription.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
@@ -201,8 +204,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 items-start">
-              {(Object.entries(SUBSCRIPTION_TIERS) as [string, typeof SUBSCRIPTION_TIERS[keyof typeof SUBSCRIPTION_TIERS]][]).map(([key, tier]) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-start">
+              {(Object.entries(SUBSCRIPTION_TIERS) as [string, typeof SUBSCRIPTION_TIERS[keyof typeof SUBSCRIPTION_TIERS]][]).filter(([, tier]) => !(tier as any).hidden).map(([key, tier]) => {
                 const highlighted = tierHighlight[key];
                 return (
                   <div
@@ -221,7 +224,7 @@ export default function HomePage() {
                       </div>
                     )}
                     <h3 className="text-base font-bold text-gray-900">{tier.label}</h3>
-                    <div className="mt-3 mb-5">
+                    <div className="mt-3 mb-2">
                       {key === "ENTERPRISE" ? (
                         <span className="text-2xl font-bold text-brand-600">Get A Quote</span>
                       ) : (
@@ -231,6 +234,9 @@ export default function HomePage() {
                         </>
                       )}
                     </div>
+                    {"tagline" in tier && (
+                      <p className="text-xs text-gray-400 italic mb-4">{(tier as any).tagline}</p>
+                    )}
                     <ul className="space-y-2.5 flex-1 mb-6">
                       {tier.features.map(f => (
                         <li key={f} className="flex items-start gap-2 text-sm text-gray-600">

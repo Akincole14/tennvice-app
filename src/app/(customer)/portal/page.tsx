@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
+import BookingActions from "@/components/portal/BookingActions";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -102,6 +103,8 @@ export default async function CustomerPortalPage() {
         <SignOutButton />
       </div>
 
+      <BookingActions properties={customer.properties.map((p) => ({ id: p.id, address: p.address }))} />
+
       {/* Next visit banner */}
       {nextVisit ? (
         <Link href={`/portal/visits/${nextVisit.id}`} className="block bg-brand-600 text-white rounded-2xl p-5 hover:bg-brand-700 transition-colors">
@@ -119,8 +122,9 @@ export default async function CustomerPortalPage() {
           </p>
         </Link>
       ) : (
-        <div className="bg-gray-100 rounded-2xl p-5 text-center text-gray-400 text-sm">
-          No upcoming visits scheduled. Contact us to book your next visit.
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 text-center">
+          <p className="text-gray-500 text-sm mb-1">No upcoming visits scheduled.</p>
+          <p className="text-gray-400 text-xs">Use the buttons above to book a visit or let AI schedule your remaining visits for the year.</p>
         </div>
       )}
 

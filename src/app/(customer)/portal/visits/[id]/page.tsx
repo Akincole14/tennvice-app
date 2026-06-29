@@ -9,6 +9,7 @@ import {
   Home, Wrench, Calendar, FileText, Clock, Ban,
 } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
+import RescheduleButton from "@/components/portal/RescheduleButton";
 
 const typeLabels: Record<string, string> = {
   ROUTINE_PLUMBING:   "Routine Plumbing",
@@ -222,15 +223,25 @@ export default async function CustomerVisitDetailPage({ params }: { params: Prom
         </div>
       </div>
 
-      {/* Upcoming visit — what to expect */}
+      {/* Upcoming visit — what to expect + reschedule */}
       {visit.status === "SCHEDULED" && (
-        <div className="bg-brand-50 border border-brand-100 rounded-2xl p-5">
-          <p className="text-sm font-semibold text-brand-800 mb-2">What to expect</p>
-          <ul className="space-y-1.5 text-sm text-brand-700">
-            <li className="flex items-start gap-2"><span className="mt-0.5">•</span>Please ensure someone is home during the visit.</li>
-            <li className="flex items-start gap-2"><span className="mt-0.5">•</span>Your technician will carry out all checks included in your plan.</li>
-            <li className="flex items-start gap-2"><span className="mt-0.5">•</span>A full report will be available here once your visit is completed.</li>
-          </ul>
+        <div className="space-y-3">
+          <div className="bg-brand-50 border border-brand-100 rounded-2xl p-5">
+            <p className="text-sm font-semibold text-brand-800 mb-2">What to expect</p>
+            <ul className="space-y-1.5 text-sm text-brand-700">
+              <li className="flex items-start gap-2"><span className="mt-0.5">•</span>Please ensure someone is home during the visit.</li>
+              <li className="flex items-start gap-2"><span className="mt-0.5">•</span>Your technician will carry out all checks included in your plan.</li>
+              <li className="flex items-start gap-2"><span className="mt-0.5">•</span>A full report will be available here once your visit is completed.</li>
+            </ul>
+          </div>
+          <div className="flex justify-end">
+            <RescheduleButton
+              visitId={visit.id}
+              scheduledAt={visit.scheduledAt.toISOString()}
+              technicianName={visit.technician?.user.name ?? null}
+              propertyAddress={property.address}
+            />
+          </div>
         </div>
       )}
 
