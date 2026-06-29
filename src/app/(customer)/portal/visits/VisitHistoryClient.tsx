@@ -141,73 +141,73 @@ export default function VisitHistoryClient({ visits }: { visits: Visit[] }) {
       ) : (
         <div className="space-y-3">
           {filtered.map((v) => (
-            <Link
+            <div
               key={v.id}
-              href={`/portal/visits/${v.id}`}
-              className="block bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+              className="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
             >
-              <div className="flex items-center justify-between p-5">
-                <div className="min-w-0">
-                  <p className="font-semibold text-gray-900">
-                    {new Date(v.scheduledAt).toLocaleDateString("en-GB", {
-                      weekday: "long", day: "numeric", month: "long", year: "numeric",
-                    })}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    {typeLabels[v.type] ?? v.type} · {v.property.address.split(",")[0]}
-                    {v.technician ? ` · ${v.technician.user.name}` : " · Technician TBC"}
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-1.5 ml-4 shrink-0">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
-                    {v.status.replace("_", " ")}
-                  </span>
-                  {v.report?.followUpRequired && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
-                      Follow-up needed
+              {/* Clickable card area — Link only wraps the content, not the reschedule strip */}
+              <Link href={`/portal/visits/${v.id}`} className="block">
+                <div className="flex items-center justify-between p-5">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900">
+                      {new Date(v.scheduledAt).toLocaleDateString("en-GB", {
+                        weekday: "long", day: "numeric", month: "long", year: "numeric",
+                      })}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      {typeLabels[v.type] ?? v.type} · {v.property.address.split(",")[0]}
+                      {v.technician ? ` · ${v.technician.user.name}` : " · Technician TBC"}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 ml-4 shrink-0">
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[v.status]}`}>
+                      {v.status.replace("_", " ")}
                     </span>
-                  )}
-                  {v.isEmergency && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-700">
-                      Emergency
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {v.report?.signedByTechnician && (
-                <div className="px-5 pb-5 pt-0">
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Report summary</p>
-                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                      {[
-                        ["Pipes",      v.report.pipesCheck],
-                        ["Heating",    v.report.heatingCheck],
-                        ["Electrical", v.report.electricalCheck],
-                        ["Boiler",     v.report.boilerCheck],
-                      ].filter(([, r]) => r !== "NOT_CHECKED").map(([label, result]) => (
-                        <div key={label as string} className="flex items-center gap-1.5">
-                          <span className="text-gray-500">{label}</span>
-                          <span className={`font-medium ${checkColors[result as string]}`}>
-                            {(result as string).charAt(0) + (result as string).slice(1).toLowerCase()}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    {v.report.recommendations && (
-                      <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-                        <span className="font-medium">Recommendations:</span> {v.report.recommendations}
-                      </p>
+                    {v.report?.followUpRequired && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                        Follow-up needed
+                      </span>
+                    )}
+                    {v.isEmergency && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-700">
+                        Emergency
+                      </span>
                     )}
                   </div>
                 </div>
-              )}
 
+                {v.report?.signedByTechnician && (
+                  <div className="px-5 pb-5 pt-0">
+                    <div className="border-t border-gray-100 pt-4">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Report summary</p>
+                      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                        {[
+                          ["Pipes",      v.report.pipesCheck],
+                          ["Heating",    v.report.heatingCheck],
+                          ["Electrical", v.report.electricalCheck],
+                          ["Boiler",     v.report.boilerCheck],
+                        ].filter(([, r]) => r !== "NOT_CHECKED").map(([label, result]) => (
+                          <div key={label as string} className="flex items-center gap-1.5">
+                            <span className="text-gray-500">{label}</span>
+                            <span className={`font-medium ${checkColors[result as string]}`}>
+                              {(result as string).charAt(0) + (result as string).slice(1).toLowerCase()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      {v.report.recommendations && (
+                        <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                          <span className="font-medium">Recommendations:</span> {v.report.recommendations}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </Link>
+
+              {/* Reschedule strip — outside the Link so modal clicks never bubble to navigation */}
               {v.status === "SCHEDULED" && (
-                <div
-                  className="px-5 pb-4 pt-3 border-t border-gray-100 flex items-center justify-between"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className="px-5 pb-4 pt-3 border-t border-gray-100 flex items-center justify-between">
                   <RescheduleButton
                     visitId={v.id}
                     scheduledAt={new Date(v.scheduledAt).toISOString()}
@@ -217,7 +217,7 @@ export default function VisitHistoryClient({ visits }: { visits: Visit[] }) {
                   <span className="text-xs text-gray-400">Tap card to view details</span>
                 </div>
               )}
-            </Link>
+            </div>
           ))}
         </div>
       )}
