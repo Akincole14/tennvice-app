@@ -51,7 +51,7 @@ export default function AdminAiScheduleButton({ propertyId, remaining }: Props) 
   }
 
   return (
-    <div className="mt-3 pt-3 border-t border-gray-100">
+    <div className="mt-4 pt-4 border-t border-gray-100">
       {result ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-1">
           <p className="text-xs font-semibold text-green-800">{result.message}</p>
