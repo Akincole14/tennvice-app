@@ -6,9 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
-  Users, Home, Calendar, AlertCircle, PoundSterling,
-  Clock, Zap, ClipboardList, TrendingUp, CheckCircle,
-  Award, Activity, Wrench, ChevronRight, Building2, Mail,
+  Users, Calendar, TrendingUp,
+  Wrench, ChevronRight, Building2, Mail,
 } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
@@ -231,16 +230,16 @@ export default async function DashboardPage() {
   const now      = new Date();
   const dateStr  = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
-  // Revenue cards hidden for STANDARD admins
+  // Revenue cards hidden for standard admins
   const allStatCards = [
-    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,      icon: PoundSterling, color: "text-emerald-600 bg-emerald-50", href: "/customers", seniorOnly: true },
-    { label: "Active customers",     value: d.activeCount,                      icon: Users,         color: "text-blue-600 bg-blue-50",      href: "/customers", seniorOnly: false },
-    { label: "Visits this week",     value: d.visitsThisWeek,                   icon: Calendar,      color: "text-purple-600 bg-purple-50",  href: "/visits",    seniorOnly: false },
-    { label: "Unassigned visits",    value: d.unassignedVisits.length,          icon: Clock,         color: "text-orange-600 bg-orange-50",  href: "/visits",    seniorOnly: false },
-    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,       icon: TrendingUp,    color: "text-teal-600 bg-teal-50",      href: "/customers", seniorOnly: true },
-    { label: "Properties",           value: d.propertyCount,                    icon: Home,          color: "text-sky-600 bg-sky-50",        href: "/properties", seniorOnly: false },
-    { label: "Completed this month", value: d.completedThisMonth,               icon: CheckCircle,   color: "text-green-600 bg-green-50",    href: "/visits",    seniorOnly: false },
-    { label: "Emergency visits",     value: d.emergencyVisits,                  icon: Zap,           color: "text-rose-600 bg-rose-50",      href: "/visits",    seniorOnly: false },
+    { label: "Monthly revenue",      value: `£${d.mrr.toLocaleString()}`,   valueColor: "text-emerald-600", href: "/customers",  seniorOnly: true  },
+    { label: "Active customers",     value: d.activeCount,                   valueColor: "text-blue-600",    href: "/customers",  seniorOnly: false },
+    { label: "Visits this week",     value: d.visitsThisWeek,                valueColor: "text-purple-600",  href: "/visits",     seniorOnly: false },
+    { label: "Unassigned visits",    value: d.unassignedVisits.length,       valueColor: d.unassignedVisits.length > 0 ? "text-orange-600" : "text-gray-900", href: "/visits", seniorOnly: false },
+    { label: "Annual revenue (ARR)", value: `£${d.arr.toLocaleString()}`,    valueColor: "text-teal-600",    href: "/customers",  seniorOnly: true  },
+    { label: "Properties",           value: d.propertyCount,                 valueColor: "text-sky-600",     href: "/properties", seniorOnly: false },
+    { label: "Completed this month", value: d.completedThisMonth,            valueColor: "text-green-600",   href: "/visits",     seniorOnly: false },
+    { label: "Emergency visits",     value: d.emergencyVisits,               valueColor: d.emergencyVisits > 0 ? "text-rose-600" : "text-gray-900", href: "/visits", seniorOnly: false },
   ];
   const statCards = allStatCards.filter(c => isSenior || !c.seniorOnly);
 
@@ -257,7 +256,7 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 py-4 md:py-8">
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -278,21 +277,16 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat cards — first 4 on mobile, all 8 on desktop */}
+      {/* Stat tiles — matches customers page layout */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        {statCards.map(({ label, value, icon: Icon, color, href }, i) => (
+        {statCards.map(({ label, value, valueColor, href }, i) => (
           <Link
             key={label}
             href={href}
-            className={`bg-white rounded-2xl border border-gray-200 p-3 md:p-5 items-center gap-3 md:gap-4 hover:border-gray-300 hover:shadow-sm transition-all ${i >= 4 ? "hidden md:flex" : "flex"}`}
+            className={`bg-white rounded-2xl border border-gray-200 px-4 md:px-5 py-4 hover:border-gray-300 hover:shadow-sm transition-all ${i >= 4 ? "hidden md:block" : "block"}`}
           >
-            <div className={`p-2 md:p-3 rounded-xl shrink-0 ${color}`}>
-              <Icon className="w-4 h-4 md:w-5 md:h-5" />
-            </div>
-            <div>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{value}</p>
-              <p className="text-xs text-gray-500 leading-tight">{label}</p>
-            </div>
+            <p className={`text-2xl md:text-3xl font-bold ${valueColor}`}>{value}</p>
+            <p className="text-xs text-gray-500 mt-1 leading-tight">{label}</p>
           </Link>
         ))}
       </div>
