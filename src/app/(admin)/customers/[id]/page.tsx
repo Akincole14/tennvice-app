@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, Home, CheckCircle, Clock, AlertTriangle, FileText, Building2, Mail } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 import QuoteSentButton from "@/components/QuoteSentButton";
+import AdminAiScheduleButton from "@/components/admin/AdminAiScheduleButton";
 import { SUBSCRIPTION_TIERS } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -318,6 +319,14 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
             const hasFollowUp = property.visits.some(
               (v) => v.report?.followUpRequired && !v.report.signedByTechnician
             );
+            const scheduledCount = property.visits.filter(
+              (v) => v.status === "SCHEDULED" && new Date(v.scheduledAt) >= now
+            ).length;
+            const completedThisYear = property.visits.filter((v) => {
+              const d = new Date(v.scheduledAt);
+              return v.status === "COMPLETED" && d.getFullYear() === now.getFullYear();
+            }).length;
+            const remainingVisits = customer.visitsPerYear - completedThisYear - scheduledCount;
             const lastChecks = lastCompleted?.report
               ? [
                   lastCompleted.report.pipesCheck,
@@ -404,6 +413,8 @@ export default async function AdminCustomerDetailPage({ params }: { params: Prom
                     ))}
                   </div>
                 )}
+
+                <AdminAiScheduleButton propertyId={property.id} remaining={remainingVisits} />
               </div>
             );
           })}
