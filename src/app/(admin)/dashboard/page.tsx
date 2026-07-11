@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   Users, Calendar, TrendingUp,
-  Wrench, ChevronRight, Building2, Mail,
+  Wrench, ChevronRight, Building2, Mail, LayoutDashboard,
 } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
@@ -256,13 +256,10 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6 py-4 md:py-8">
+      {/* Nav row — matches admins page top row */}
+      <div className="flex items-center justify-between gap-4">
+        <div />
         <div className="flex items-center gap-3">
           {d.newCustomersThisMonth > 0 && (
             <div className="hidden sm:flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-sm text-green-700">
@@ -275,6 +272,15 @@ export default async function DashboardPage() {
           )}
           <SignOutButton />
         </div>
+      </div>
+
+      {/* Title block — matches admins page title style */}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <LayoutDashboard className="w-6 h-6 text-brand-600" />
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        </div>
+        <p className="text-sm text-gray-500">{dateStr}</p>
       </div>
 
       {/* Stat tiles — matches customers page layout */}
