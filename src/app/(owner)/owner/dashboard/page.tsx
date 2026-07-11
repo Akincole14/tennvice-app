@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   Users, Home, Calendar,
   PoundSterling, Clock, Zap,
-  TrendingUp, CheckCircle, Building2, Mail,
+  TrendingUp, CheckCircle, Building2, Mail, LayoutDashboard,
 } from "lucide-react";
 import OwnerSignOutButton from "@/components/OwnerSignOutButton";
 import QuoteSentButton from "@/components/QuoteSentButton";
@@ -154,12 +154,15 @@ export default async function OwnerDashboardPage() {
     : null;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 py-4 md:py-8">
+    <div className="max-w-6xl mx-auto space-y-5 md:space-y-8 py-4 md:py-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
+        <div className="flex items-center gap-2">
+          <LayoutDashboard className="w-6 h-6 text-brand-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-500 text-sm mt-0.5">{dateStr}</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {d.newCustomersThisMonth > 0 && (
@@ -181,14 +184,14 @@ export default async function OwnerDashboardPage() {
           <Link
             key={label}
             href={href}
-            className={`bg-white rounded-2xl border border-gray-200 p-3 md:p-5 items-center gap-3 md:gap-4 hover:border-gray-300 hover:shadow-sm transition-all ${i >= 4 ? "hidden md:flex" : "flex"}`}
+            className={`bg-white rounded-2xl border border-gray-200 p-3 sm:p-5 flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 text-center sm:text-left hover:border-gray-300 hover:shadow-sm transition-all ${i >= 4 ? "hidden md:flex" : "flex"}`}
           >
-            <div className={`p-2 md:p-3 rounded-xl shrink-0 ${color}`}>
-              <Icon className="w-4 h-4 md:w-5 md:h-5" />
+            <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${color}`}>
+              <Icon className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xl md:text-2xl font-bold text-gray-900">{value}</p>
-              <p className="text-xs text-gray-500 leading-tight">{label}</p>
+              <p className="text-lg sm:text-xl font-bold text-gray-900">{value}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 leading-tight">{label}</p>
             </div>
           </Link>
         ))}

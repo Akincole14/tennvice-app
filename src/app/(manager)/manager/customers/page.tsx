@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ManagerCustomersClient from "./ManagerCustomersClient";
 import ManagerSignOutButton from "@/components/ManagerSignOutButton";
+import Link from "next/link";
+import { Users, ArrowLeft } from "lucide-react";
 
 const TIER_PRICES: Record<string, number> = {
   BASIC: 19, STANDARD: 26, PLUS: 35, PREMIUM: 40, ENTERPRISE: 0,
@@ -39,10 +41,21 @@ export default async function ManagerCustomersPage() {
   const mrr       = active.reduce((sum, c) => sum + (TIER_PRICES[c.subscriptionTier] ?? 0), 0);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5 md:space-y-6 py-4 md:py-8">
+    <div className="max-w-6xl mx-auto space-y-6 py-4 md:py-8">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Customers</h1>
+        <Link href="/manager/dashboard" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900">
+          <ArrowLeft className="w-4 h-4" />
+          Dashboard
+        </Link>
         <ManagerSignOutButton />
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <Users className="w-6 h-6 text-brand-600" />
+          <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+        </div>
+        <p className="text-sm text-gray-500">View and manage all customer accounts and subscriptions.</p>
       </div>
 
       <div className="grid gap-3 md:gap-4 grid-cols-3 sm:grid-cols-5">
