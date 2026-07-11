@@ -92,7 +92,7 @@ export default async function VisitReportsPage() {
   const current = months[months.length - 1];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-4 md:py-8">
+    <div className="max-w-4xl mx-auto space-y-6 py-4 md:py-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
